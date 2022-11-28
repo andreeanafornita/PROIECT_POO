@@ -1,23 +1,28 @@
 #pragma once
 #include "Location.h"
+#include"Event.h"
 class Ticket
 {
 private:
-	bool VIP = 0;
-	int lawn;
-	int tribune;
+	Event event;
+	float price;
+	bool isUsed = false;
 	Location location;//locatia din clasa Location
 	static int sequence;
 	const int id;
 	Ticket(bool VIP, int lawn, int tribune, int boxes): id(sequence) {
-		this->VIP = VIP;
-		this->lawn = lawn;
-		this->tribune = tribune;
+		
 		++Ticket::sequence;//crestem sequence cu 1
 	}
 
+public:
+	static void useTicket(Ticket ticket) {
+		ticket.isUsed = true;
+	}
 
-
+	static bool checkTicket(Ticket ticket) {
+		return ticket.isUsed;
+	}
 };
 
 

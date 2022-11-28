@@ -43,6 +43,10 @@ public:
 	int getAvailableNoOfSeats() {
 		return this->availableNoOfSeats;
 	}
+
+	static void printLocation(Location location) {
+		cout << location;
+	}
 	void setNoOfRows(int noOfRows) {
 		if (noOfRows > 0) {
 			this->noOfRows = noOfRows;
