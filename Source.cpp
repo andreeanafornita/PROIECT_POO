@@ -1,6 +1,11 @@
 #include<iostream>
+#include "Location.h"
 using namespace std;
 int main() {
-	cout << "Hello world";
+
+	Location location1;
+	cin >> location1;
+	cout << location1;
+
 	return 0;
 }
