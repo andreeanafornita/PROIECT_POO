@@ -133,7 +133,7 @@ void operator>>(istream& in, Ticket& ticket) {
 	ticket.checkTicket(ticket);
 }
 bool operator==(Ticket& ticket1, Ticket& ticket2) {//this is the operator "=="
-	return ticket2.getId() == ticket2.getLocation();
+	return ticket1.getId() == ticket2.getLocation();
 }
 
 
