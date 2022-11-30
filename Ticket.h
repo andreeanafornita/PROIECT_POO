@@ -41,7 +41,7 @@ public:
 		this->event = event;
 	}
 	float setPrice(float price) {
-		if (price = 0) {
+		if (price == 0) {
 			cout << "The price can't be negative ";
 			exit(0);
 		}
@@ -107,7 +107,9 @@ public:
 		return this->id == 0;
 	}
 
-
+	bool operator>(Ticket& ticket) {
+		return this->id > ticket.id;
+	}
 };
 
 void operator<<( ostream& out, Ticket ticket){
@@ -132,9 +134,8 @@ void operator>>(istream& in, Ticket& ticket) {
 	ticket.useTicket(ticket);
 	ticket.checkTicket(ticket);
 }
-bool operator==(Ticket& ticket1, Ticket& ticket2) {//this is the operator "=="
-	return ticket1.getId() == ticket2.getLocation();
-}
+
+
 
 
 
