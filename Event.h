@@ -106,6 +106,10 @@ public:
 		return this->eventId > event.eventId;
 	}
 
+	static void printEvent(Event event) {//this is a static method that has the target to print the location from class Location
+		cout << event;
+	}
+
 	};
 
 void operator<<(ostream& out, Event event) {//this is the operator "<<"

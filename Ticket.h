@@ -11,18 +11,18 @@ private:
 	 int id;
 
 public:
-	Ticket(Event event, float price, bool isUsed, Location location){
+	Ticket(Event event, float price, bool isUsed, Location location){//this is a constructor for class ticket, it may be implemented like this, with setters, or in a classic way:"this->variable=variable"
 		this->setEvent(event);
 		this->setPrice(price);
 		this->setIsUsed(isUsed);
 		this->setLocation(location);
 		this->setId(id);
 	}
-	Ticket(){
+	Ticket(){//this is the default constructor, uith initializer for the boolean variable in false
 		this->isUsed = false;
 	}
 
-	Event getEvent() {
+	Event getEvent() {//those 5 getters are initialized particulary for each variable with different types
 		return this->event;
 	}
 	float getPrice() {
@@ -37,12 +37,12 @@ public:
 	int getId() {
 		return this->id;
 	}
-	void setEvent(Event event) {//trebuie sa pun dupa o conditie
+	void setEvent(Event event) {//after we create getters, we must create setters for the variables who are coming  with conditions for existence 
 		this->event = event;
 	}
 	float setPrice(float price) {
 		if (price == 0) {
-			cout << "The price can't be negative ";
+			cout << "The price can't be negative ";//if the number introduced isn't introduced correctly, it will appear a warnings message
 			exit(0);
 		}
 		else if (price == 0) {
@@ -70,11 +70,11 @@ public:
 
 
 
-	static void useTicket(Ticket ticket) {
+	static void useTicket(Ticket ticket) {//this is a static method by which we can make a ticket from "not used" to "used"
 		ticket.isUsed = true;
 	}
 
-	static bool checkTicket(Ticket ticket) {
+	static bool checkTicket(Ticket ticket) {//this is a static method by which we can verify if a ticket is used or not
 		return ticket.isUsed;
 	}
 
@@ -110,21 +110,26 @@ public:
 	bool operator>(Ticket& ticket) {
 		return this->id > ticket.id;
 	}
+
+	static void printTicket(Ticket ticket) {//this is a static method that has the target to print the location from class Location
+		cout << ticket;
+	}
+
 };
 
-void operator<<( ostream& out, Ticket ticket){
+void operator<<( ostream& out, Ticket ticket){//this is the output operator
 	out << endl << "id: " << ticket.id;
-	//out << endl << "The event is: " << ticket.event; 
+	out << endl << "The event is: " << ticket.event; 
 	out << endl << "price: " << ticket.price;
 	out << endl << "is it used? : " << ticket.isUsed;
 	out << endl << "location is : " << ticket.location;
 
 	}
-void operator>>(istream& in, Ticket& ticket) {
+void operator>>(istream& in, Ticket& ticket) {//this is the input operator
 	cout << endl << "id: ";
 	in >> ticket.id;
 	cout << endl << "event is: ";
-	//in >> ticket1.event;
+	in >> ticket.event;
 	cout << endl << "price: ";
 	in >> ticket.price;
 	cout << endl << "location is: ";
