@@ -1,6 +1,6 @@
 #pragma once
 #include "Location.h"
-#include"Event.h"
+#include"Event.h"//we should introduce on libraries those two, location and event because we want to include them in class "ticket"
 class Ticket
 {
 private:
@@ -59,7 +59,7 @@ public:
 				exit(0);
 		}
 	}
-	Location setLocation(Location location) {
+	Location setLocation(Location location) {//this is a setter for class location
 		this->location = location;
 	}
 	int setId(int id) {

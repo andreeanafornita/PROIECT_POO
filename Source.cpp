@@ -11,21 +11,21 @@ int main() {
 	cout << endl;
 	Location::printLocation(location1);
 	cout << endl;
-	cout << "You have entered the location details succesfully";
+	cout << "You have entered the location details succesfully";//we setted and called succesfully class location
 	Event event1;
 	cin >> event1;
 	cout << event1;
 	cout << endl;
 	Event::printEvent(event1);
 	cout << endl;
-	cout << "You have entered the event details succesfully";
+	cout << "You have entered the event details succesfully";//we setted and called succesfully class event
 	Ticket ticket1;
 	cin >> ticket1;
 	cout << ticket1;
 	cout << endl;
 	Ticket::printTicket(ticket1);
 	cout << endl;
-	cout << "You have entered the ticket details succesfully";
+	cout << "You have entered the ticket details succesfully";//we setted cand called succesfully class ticket
 
 	return 0;
 }
