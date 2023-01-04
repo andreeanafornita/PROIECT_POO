@@ -11,7 +11,7 @@ private:
 	 int id;
 
 public:
-	Ticket(Event event, float price, bool isUsed, Location location){//this is a constructor for class ticket, it may be implemented like this, with setters, or in a classic way:"this->variable=variable"
+	Ticket(Event event, float price, bool isUsed, Location location, int id){//this is a constructor for class ticket, it may be implemented like this, with setters, or in a classic way:"this->variable=variable"
 		this->setEvent(event);
 		this->setPrice(price);
 		this->setIsUsed(isUsed);
