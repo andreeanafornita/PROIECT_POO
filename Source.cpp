@@ -1,9 +1,52 @@
 #include<iostream>
+#include<fstream>
+#include<vector>
 #include "Location.h"
 #include "Event.h"
 #include "Ticket.h"
+
 using namespace std;
-int main(args[], argc* ) {
+
+void displayMenu() {
+	cout << "MENIU:" << endl;
+	cout << "1.See the events" << endl;
+	cout << "2.Buy tickets" << endl;
+	cout << "3.Check the locations" << endl;
+	cout << "4.Check ticket" << endl;
+}
+
+int main(int argc, char *argv[]) {
+
+	//before this read all tickets created before from binary file
+	vector<int> commands;
+	//in commands we store the option and all necessary arguments for each option
+	if (argc == 2) {
+		ifstream fin(argv[1]);
+
+		if (fin.is_open()) {
+			int command;
+			while (fin >> command) {
+				commands.push_back(command);
+			}
+		}
+		else {
+			std::cout << "Invalid file passed as argument" << endl;
+			displayMenu();
+		}
+		fin.close();
+	}
+	else {
+		std::cout << "HERE";
+		return 0;
+	}
+
+	//TESTING
+	//for (auto command : commands) {
+	//	cout << command << " ";
+	//}
+
+	//cout << endl;
+	//
 
 	////Location location1;
 	////cin >> location1;
