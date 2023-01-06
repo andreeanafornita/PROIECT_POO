@@ -129,10 +129,10 @@ public:
 };
 
 void operator<<(ostream& out, Event event) {//this is the operator "<<"
-	out << endl << "Event id: " << event.eventId;
-	out << endl << "Event name: " << (event.name != nullptr ? string(event.name) : "No name");
-	out << endl << "Date and time: " << (event.dateAndTime != nullptr ? string(event.dateAndTime) : "No date and time");
-	out << endl << "location is : " << event.location.getlocationName();
+	out << endl << "Event id: " << event.eventId << endl;
+	out << endl << "Event name: " << (event.name != nullptr ? string(event.name) : "No name") << endl;
+	out << endl << "Date and time: " << (event.dateAndTime != nullptr ? string(event.dateAndTime) : "No date and time") << endl;
+	out << endl << "Location is : " << event.location.getlocationName() << endl;
 }
 void operator>>(istream& in, Event& event) {//this is the operator">>"
 	cout << endl << "Location ID: ";

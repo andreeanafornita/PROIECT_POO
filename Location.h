@@ -163,15 +163,23 @@ public:
 		return this->availableNoOfSeats == 0;
 	}
 
+	bool operator==(const Location& l) const
+	{
+		if (this->locationId == l.locationId)
+		{
+			return true;
+		}
+		return false;
+	}
 
 };
 void operator<<(ostream& out, Location location) {//this is the operator "<<"
-	out << endl << "Location name: " << (location.locationName != nullptr ? string(location.locationName) : "No name");
-	out << endl << "Location id: " << location.locationId;
-	out << endl << "Number of rows are :  " << location.noOfRows;
-	out << endl << "Number of seats available are: " << location.availableNoOfSeats;
-	out << endl << "The number of seats per row are: " << location.noOfSeatsPerRow;
-	out << endl << "The total number of seats are: " << location.totalNoOfSeats;
+	out << endl << "Location name: " << (location.locationName != nullptr ? string(location.locationName) : "No name") << endl;
+	out << endl << "Location id: " << location.locationId << endl;
+	out << endl << "Number of rows are :  " << location.noOfRows << endl;
+	out << endl << "Number of seats available are: " << location.availableNoOfSeats << endl;
+	out << endl << "The number of seats per row are: " << location.noOfSeatsPerRow << endl;
+	out << endl << "The total number of seats are: " << location.totalNoOfSeats << endl;
 }
 
 void operator>>(istream& in, Location& location) {//this is the operator">>"

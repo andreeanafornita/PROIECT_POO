@@ -21,16 +21,19 @@ public:
 		this->isUsed = false;
 	}
 
-	static void readTicket(Ticket& ticket, string fileName) {
+	static bool readTicket(Ticket& ticket, string fileName) {
 		ifstream fin(fileName, ios::out | ios::binary);
 		if (!fin) {
 			cout << "Cannot open " << fileName << " for reading!" << endl;
+			return false;
 		}
 		fin.read((char*)&ticket, sizeof(Ticket));
 		fin.close();
 		if (!fin.good()) {
 			cout << "Error occurred while reading " << fileName << "!" << endl;
+			return false;
 		}
+		return true;
 	}
 
 	Event getEvent() {//those 5 getters are initialized particulary for each variable with different types
@@ -93,6 +96,14 @@ public:
 	bool operator==(const Ticket& t) const
 	{
 		if (this->id == t.id && this->event == t.event)
+		{
+			return true;
+		}
+		return false;
+	}
+	bool operator==(int& id) const
+	{
+		if (this->id == id)
 		{
 			return true;
 		}
