@@ -23,14 +23,14 @@ void readTickets() {
 	evDate = evd;
 	char* evName = new char[strlen(evn) + 1];
 	evName = evn;
-	Event ev(evDate, evName, 200);
-
 	char locn[] = "Stadion";
 	char* locName = new char[strlen(locn) + 1];
 	locName = locn;
 	Location loc(22, locName, 4000, 20);
+	Event ev(evDate, evName,loc, 200);
 
-	Ticket tWrite(ev, 40.0, false, loc, 22);
+
+	Ticket tWrite(ev, 40.0, false, 22);
 	fstream wf("ticket.dat", ios::out | ios::binary);
 	if (!wf) {
 		cout << "Cannot open file!" << endl;

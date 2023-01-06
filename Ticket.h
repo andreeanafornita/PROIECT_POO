@@ -1,7 +1,6 @@
 #pragma once
 #include <fstream>
 #include <string>
-#include "Location.h"
 #include "Event.h"//we should introduce on libraries those two, location and event because we want to include them in class "ticket"
 class Ticket
 {
@@ -9,15 +8,13 @@ private:
 	Event event;
 	float price;
 	bool isUsed;
-	Location location;//locatia din clasa Location
 	int id;
 
 public:
-	Ticket(Event event, float price, bool isUsed, Location location, int id) {//this is a constructor for class ticket, it may be implemented like this, with setters, or in a classic way:"this->variable=variable"
+	Ticket(Event event, float price, bool isUsed, int id) {//this is a constructor for class ticket, it may be implemented like this, with setters, or in a classic way:"this->variable=variable"
 		this->setEvent(event);
 		this->setPrice(price);
 		this->setIsUsed(isUsed);
-		this->setLocation(location);
 		this->setId(id);
 	}
 	Ticket() {//this is the default constructor, uith initializer for the boolean variable in false
@@ -44,9 +41,6 @@ public:
 	}
 	bool getIsUsed() {
 		return this->isUsed;
-	}
-	Location getLocation() {
-		return this->location;
 	}
 	int getId() {
 		return this->id;
@@ -75,9 +69,6 @@ public:
 			exit(1);
 		}
 	}
-	void setLocation(Location location) {//this is a setter for class location
-		this->location = location;
-	}
 	void setId(int id) {
 		this->id = id;
 	}
@@ -97,16 +88,21 @@ public:
 		this->event = aux.event;
 		this->price = aux.price;
 		this->isUsed = aux.isUsed;
-		this->location = aux.location;
 		this->id = aux.id;
 	}
-
+	bool operator==(const Ticket& t) const
+	{
+		if (this->id == t.id && this->event == t.event)
+		{
+			return true;
+		}
+		return false;
+	}
 	Ticket(const Ticket& aux1) {//this is a copy constructor
 
 		this->event = aux1.event;
 		this->price = aux1.price;
 		this->isUsed = aux1.isUsed;
-		this->location = aux1.location;
 		this->id = aux1.id;
 	}
 	friend void operator<<(ostream& out, Ticket ticket);
@@ -131,7 +127,6 @@ void operator<<(ostream& out, Ticket ticket) {//this is the output operator
 	out << endl << "The event is: " << ticket.event;
 	out << endl << "price: " << ticket.price;
 	out << endl << "is it used? : " << ticket.isUsed;
-	out << endl << "location is : " << ticket.location;
 
 }
 void operator>>(istream& in, Ticket& ticket) {//this is the input operator
@@ -141,8 +136,6 @@ void operator>>(istream& in, Ticket& ticket) {//this is the input operator
 	in >> ticket.event;
 	cout << endl << "price: ";
 	in >> ticket.price;
-	cout << endl << "location is: ";
-	in >> ticket.location;
 	cout << endl << "is it used?";
 	in >> ticket.isUsed;
 	ticket.useTicket(ticket);

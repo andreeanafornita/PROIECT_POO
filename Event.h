@@ -1,16 +1,18 @@
 #pragma once
-
+#include "Location.h"
 class Event
 {
 private:
 	char* dateAndTime;
 	char* name;
 	int eventId;
+	Location location;//locatia din clasa Location
 public:
-	Event(char* dateAndTime, char* name, int eventId) {
+	Event(char* dateAndTime, char* name, Location location,int eventId) {
 		this->setDateAndTime(dateAndTime);
 		this->setEventId(eventId);
 		this->setName(name);
+		this->setLocation(location);
 	}
 	Event() {
 		this->eventId = 0;
@@ -23,6 +25,9 @@ public:
 	}
 	int getEventId(int eventId) {
 		return this->eventId = eventId;
+	}
+	Location getLocation() {
+		return this->location;
 	}
 	void setDateAndTime(char* dateAndTime) {
 		if (dateAndTime == nullptr || strlen(dateAndTime) == 0) {
@@ -48,7 +53,9 @@ public:
 	void setEventId(int eventId) {
 		this->eventId = eventId;
 	}
-
+	void setLocation(Location location) {//this is a setter for class location
+		this->location = location;
+	}
 	~Event() {
 		delete[] this->name;
 		delete[] this->dateAndTime;
@@ -76,7 +83,15 @@ public:
 			this->name = new char[strlen(aux.name) + 1];
 			strcpy(this->name, aux.name);
 		}
-
+		this->location = aux.location;
+	}
+	bool operator==(const Event& e) const
+	{
+		if (this->eventId == e.eventId)
+		{
+			return true;
+		}
+		return false;
 	}
 	Event(const Event& aux1) {//this is a copy constructor
 		if (aux1.name != nullptr) {
@@ -95,6 +110,7 @@ public:
 		else {
 			this->dateAndTime = nullptr;
 		}
+		this->location = aux1.location;
 	}
 	friend void operator<<(ostream& out, Event event);
 	friend void operator>>(istream& in, Event& event);
@@ -116,6 +132,7 @@ void operator<<(ostream& out, Event event) {//this is the operator "<<"
 	out << endl << "Event id: " << event.eventId;
 	out << endl << "Event name: " << (event.name != nullptr ? string(event.name) : "No name");
 	out << endl << "Date and time: " << (event.dateAndTime != nullptr ? string(event.dateAndTime) : "No date and time");
+	out << endl << "location is : " << event.location.getlocationName();
 }
 void operator>>(istream& in, Event& event) {//this is the operator">>"
 	cout << endl << "Location ID: ";
@@ -128,4 +145,5 @@ void operator>>(istream& in, Event& event) {//this is the operator">>"
 	char buffer1[100];
 	in >> buffer1;
 	event.setDateAndTime(buffer1);
+	in >> event.location;
 }

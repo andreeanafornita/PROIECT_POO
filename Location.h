@@ -32,7 +32,7 @@ public:
 	int getNoOfRows() {//this is the getter for number of rows, those getters must be done in order to work with the variables later, in fact they return the variable, that's why we use the word "return"
 		return this->noOfRows;
 	}
-	char* getlocationName() {
+	char* getlocationName() const {
 		return this->locationName;
 	}
 	int getNoOfSeatsPerRow() {
@@ -131,7 +131,7 @@ public:
 		this->noOfRows = aux.noOfRows;
 		this->noOfSeatsPerRow = aux.noOfSeatsPerRow;
 		this->totalNoOfSeats = aux.totalNoOfSeats;
-		if (this->locationName) {
+		if (this->locationName != nullptr) {
 			delete[] this->locationName;
 			this->locationName = nullptr;
 		}
@@ -166,13 +166,12 @@ public:
 
 };
 void operator<<(ostream& out, Location location) {//this is the operator "<<"
+	out << endl << "Location name: " << (location.locationName != nullptr ? string(location.locationName) : "No name");
 	out << endl << "Location id: " << location.locationId;
 	out << endl << "Number of rows are :  " << location.noOfRows;
 	out << endl << "Number of seats available are: " << location.availableNoOfSeats;
 	out << endl << "The number of seats per row are: " << location.noOfSeatsPerRow;
 	out << endl << "The total number of seats are: " << location.totalNoOfSeats;
-
-	out << endl << "Location name: " << (location.locationName != nullptr ? string(location.locationName) : "No name");
 }
 
 void operator>>(istream& in, Location& location) {//this is the operator">>"
