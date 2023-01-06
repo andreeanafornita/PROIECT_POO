@@ -15,9 +15,47 @@ void displayMenu() {
 	cout << "4.Check ticket" << endl;
 }
 
-int main(int argc, char *argv[]) {
+void readTickets() {
+	//TESTING
+	char evd[] = "10-10-2022 10:30";
+	char evn[] = "Festival";
+	char* evDate = new char[strlen(evd) + 1];
+	evDate = evd;
+	char* evName = new char[strlen(evn) + 1];
+	evName = evn;
+	Event ev(evDate, evName, 200);
 
-	//before this read all tickets created before from binary file
+	char locn[] = "Stadion";
+	char* locName = new char[strlen(locn) + 1];
+	locName = locn;
+	Location loc(22, locName, 4000, 20);
+
+	Ticket tWrite(ev, 40.0, false, loc, 22);
+	fstream wf("ticket.dat", ios::out | ios::binary);
+	if (!wf) {
+		cout << "Cannot open file!" << endl;
+		return;
+	}
+	wf.write((char*)&tWrite, sizeof(Ticket));
+	wf.close();
+	if (!wf.good()) {
+		cout << "Error occurred at writing time!" << endl;
+		return;
+	}
+	Ticket t;
+	Ticket::readTicket(t, "ticket.dat");
+	//
+}
+
+int main(int argc, char* argv[]) {
+	vector<Location> locations;
+	vector<Event> events;
+	vector<Ticket> tickets;
+
+	//read tickets
+
+	readTickets();
+
 	vector<int> commands;
 	//in commands we store the option and all necessary arguments for each option
 	if (argc == 2) {
@@ -36,7 +74,7 @@ int main(int argc, char *argv[]) {
 		fin.close();
 	}
 	else {
-		std::cout << "HERE";
+		std::cout << "No file passed as argument. Here is the menu:" << endl;
 		return 0;
 	}
 
@@ -74,52 +112,52 @@ int main(int argc, char *argv[]) {
 	//Hardcoded meniu when there are not tickets available for all the events
 	while (true) {
 		int choice;
-		cout << "MENIU:"<<endl;
+		cout << "MENIU:" << endl;
 		cout << "1.Let's see the events" << endl;
 		cout << "2.Buy tickets" << endl;
 		cout << "3.Check the locations" << endl;
 		cin >> choice;
 		switch (choice) {
-			case 1: 
-				cout << "Upcoming events: " << endl;
-				cout << "1.Untold" << endl;
-				cout << "2.Neversea" << endl;
-				cin >> choice;
-				switch (choice) {
-					case 1:
-						cout << "Untold: " << endl;
-						cout << "Tickets sold out" << endl;
-
-					case 2:
-						cout << "Neversea: " << endl;
-						cout << "Tickets sold out" << endl;
-
-				}
+		case 1:
+			cout << "Upcoming events: " << endl;
+			cout << "1.Untold" << endl;
+			cout << "2.Neversea" << endl;
+			cin >> choice;
+			switch (choice) {
+			case 1:
+				cout << "Untold: " << endl;
+				cout << "Tickets sold out" << endl;
 
 			case 2:
-				cout << "Tickets sold out: " << endl;
+				cout << "Neversea: " << endl;
+				cout << "Tickets sold out" << endl;
+
+			}
+
+		case 2:
+			cout << "Tickets sold out: " << endl;
 
 
-			case 3:
-				cout << "Locations: " << endl;
-				cout << "1. Cluj" << endl;
-				cout << "2. Constanta" << endl;
-				cin >> choice;
-				switch (choice) {
-					case 1:
-						cout << "Cluj events: " << endl;
-						cout << "Untold: tickets sold out" << endl;
+		case 3:
+			cout << "Locations: " << endl;
+			cout << "1. Cluj" << endl;
+			cout << "2. Constanta" << endl;
+			cin >> choice;
+			switch (choice) {
+			case 1:
+				cout << "Cluj events: " << endl;
+				cout << "Untold: tickets sold out" << endl;
 
 
-					case 2:
-						cout << "Constanta events: " << endl;
-						cout << "Neversea: tickets sold out" << endl;
+			case 2:
+				cout << "Constanta events: " << endl;
+				cout << "Neversea: tickets sold out" << endl;
 
-				}
+			}
 
 		}
-	
-		
+
+
 
 	}
 

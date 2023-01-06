@@ -12,7 +12,7 @@ public:
 		this->setEventId(eventId);
 		this->setName(name);
 	}
-	Event(){  
+	Event() {
 		this->eventId = 0;
 	}
 	char* getDateAndTime(char* dateAndTime) {
@@ -26,7 +26,7 @@ public:
 	}
 	void setDateAndTime(char* dateAndTime) {
 		if (dateAndTime == nullptr || strlen(dateAndTime) == 0) {
-			exit(0);
+			exit(1);
 		}
 		if (this->dateAndTime != nullptr) {
 			delete[] this->dateAndTime;
@@ -37,7 +37,7 @@ public:
 
 	void setName(char* name) {
 		if (name == nullptr || strlen(name) == 0) {
-			exit(0);
+			exit(1);
 		}
 		if (this->name != nullptr) {
 			delete[] this->name;
@@ -53,7 +53,7 @@ public:
 		delete[] this->name;
 		delete[] this->dateAndTime;
 	}
-	
+
 	void operator=(const Event& aux) {//this is an operator type "="
 		if (this == &aux) {
 			return;
@@ -110,7 +110,7 @@ public:
 		cout << event;
 	}
 
-	};
+};
 
 void operator<<(ostream& out, Event event) {//this is the operator "<<"
 	out << endl << "Event id: " << event.eventId;

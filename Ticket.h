@@ -1,6 +1,8 @@
 #pragma once
+#include <fstream>
+#include <string>
 #include "Location.h"
-#include"Event.h"//we should introduce on libraries those two, location and event because we want to include them in class "ticket"
+#include "Event.h"//we should introduce on libraries those two, location and event because we want to include them in class "ticket"
 class Ticket
 {
 private:
@@ -8,18 +10,30 @@ private:
 	float price;
 	bool isUsed;
 	Location location;//locatia din clasa Location
-	 int id;
+	int id;
 
 public:
-	Ticket(Event event, float price, bool isUsed, Location location, int id){//this is a constructor for class ticket, it may be implemented like this, with setters, or in a classic way:"this->variable=variable"
+	Ticket(Event event, float price, bool isUsed, Location location, int id) {//this is a constructor for class ticket, it may be implemented like this, with setters, or in a classic way:"this->variable=variable"
 		this->setEvent(event);
 		this->setPrice(price);
 		this->setIsUsed(isUsed);
 		this->setLocation(location);
 		this->setId(id);
 	}
-	Ticket(){//this is the default constructor, uith initializer for the boolean variable in false
+	Ticket() {//this is the default constructor, uith initializer for the boolean variable in false
 		this->isUsed = false;
+	}
+
+	static void readTicket(Ticket& ticket, string fileName) {
+		ifstream fin(fileName, ios::out | ios::binary);
+		if (!fin) {
+			cout << "Cannot open " << fileName << " for reading!" << endl;
+		}
+		fin.read((char*)&ticket, sizeof(Ticket));
+		fin.close();
+		if (!fin.good()) {
+			cout << "Error occurred while reading " << fileName << "!" << endl;
+		}
 	}
 
 	Event getEvent() {//those 5 getters are initialized particulary for each variable with different types
@@ -40,35 +54,33 @@ public:
 	void setEvent(Event event) {//after we create getters, we must create setters for the variables who are coming  with conditions for existence 
 		this->event = event;
 	}
-	float setPrice(float price) {
-		if (price == 0) {
+	void setPrice(float price) {
+		if (price < 0) {
 			cout << "The price can't be negative ";//if the number introduced isn't introduced correctly, it will appear a warnings message
-			exit(0);
+			exit(1);
 		}
-		else if (price == 0) {
-			cout << "the price is 0, make sure if you want to give it for free ";
-				this->price = price;
+		else {
+			if (price == 0) {
+				cout << "the price is 0, make sure if you want to give it for free ";
+			}
+			this->price = price;
 		}
 	}
-	bool setIsUsed(bool isUsed) {
-		if (bool isUsed = false) {
-			this->isUsed = isUsed = true;
+	void setIsUsed(bool isUsed) {
+		if (!isUsed) {
+			this->isUsed = isUsed;
 		}
-		else if (bool isUsed = true) {
+		else {
 			cout << "The ticket is aleready used";
-				exit(0);
+			exit(1);
 		}
 	}
-	Location setLocation(Location location) {//this is a setter for class location
+	void setLocation(Location location) {//this is a setter for class location
 		this->location = location;
 	}
-	int setId(int id) {
+	void setId(int id) {
 		this->id = id;
 	}
-
-
-
-
 
 	static void useTicket(Ticket ticket) {//this is a static method by which we can make a ticket from "not used" to "used"
 		ticket.isUsed = true;
@@ -78,14 +90,11 @@ public:
 		return ticket.isUsed;
 	}
 
-
-
-
 	void operator=(const Ticket& aux) {//this is an operator type "="
 		if (this == &aux) {
 			return;
 		}
-		this->event= aux.event;
+		this->event = aux.event;
 		this->price = aux.price;
 		this->isUsed = aux.isUsed;
 		this->location = aux.location;
@@ -93,7 +102,7 @@ public:
 	}
 
 	Ticket(const Ticket& aux1) {//this is a copy constructor
-		
+
 		this->event = aux1.event;
 		this->price = aux1.price;
 		this->isUsed = aux1.isUsed;
@@ -117,14 +126,14 @@ public:
 
 };
 
-void operator<<( ostream& out, Ticket ticket){//this is the output operator
+void operator<<(ostream& out, Ticket ticket) {//this is the output operator
 	out << endl << "id: " << ticket.id;
-	out << endl << "The event is: " << ticket.event; 
+	out << endl << "The event is: " << ticket.event;
 	out << endl << "price: " << ticket.price;
 	out << endl << "is it used? : " << ticket.isUsed;
 	out << endl << "location is : " << ticket.location;
 
-	}
+}
 void operator>>(istream& in, Ticket& ticket) {//this is the input operator
 	cout << endl << "id: ";
 	in >> ticket.id;
