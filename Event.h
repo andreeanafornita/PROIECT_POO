@@ -1,14 +1,15 @@
 #pragma once
 #include "Location.h"
+#include <string.h>
 class Event
 {
 private:
-	char* dateAndTime;
-	char* name;
+	string dateAndTime;
+	string name;
 	int eventId;
 	Location location;//locatia din clasa Location
 public:
-	Event(char* dateAndTime, char* name, Location location,int eventId) {
+	Event(string dateAndTime, string name, Location location,int eventId) {
 		this->setDateAndTime(dateAndTime);
 		this->setEventId(eventId);
 		this->setName(name);
@@ -17,10 +18,10 @@ public:
 	Event() {
 		this->eventId = 0;
 	}
-	char* getDateAndTime(char* dateAndTime) {
+	string getDateAndTime(string dateAndTime) {
 		return this->dateAndTime = dateAndTime;
 	}
-	char* getName(char* name) {
+	string getName(string name) {
 		return this->name = name;
 	}
 	int getEventId(int eventId) {
@@ -29,26 +30,20 @@ public:
 	Location getLocation() {
 		return this->location;
 	}
-	void setDateAndTime(char* dateAndTime) {
-		if (dateAndTime == nullptr || strlen(dateAndTime) == 0) {
+	void setDateAndTime(string dateAndTime) {
+		if (dateAndTime.empty() || dateAndTime.length() == 0) {
 			exit(1);
 		}
-		if (this->dateAndTime != nullptr) {
-			delete[] this->dateAndTime;
-		}
-		this->dateAndTime = new char[strlen(dateAndTime) + 1];
-		strcpy(this->dateAndTime, dateAndTime);
+		this->dateAndTime.clear();
+		this->dateAndTime = dateAndTime;
 	}
 
-	void setName(char* name) {
-		if (name == nullptr || strlen(name) == 0) {
+	void setName(string name) {
+		if (name.empty() || name.length() == 0) {
 			exit(1);
 		}
-		if (this->name != nullptr) {
-			delete[] this->name;
-		}
-		this->name = new char[strlen(name) + 1];
-		strcpy(this->name, name);
+		this->name.clear();
+		this->name = name;
 	}
 	void setEventId(int eventId) {
 		this->eventId = eventId;
@@ -56,33 +51,16 @@ public:
 	void setLocation(Location location) {//this is a setter for class location
 		this->location = location;
 	}
-	~Event() {
-		delete[] this->name;
-		delete[] this->dateAndTime;
-	}
+	/*~Event() {
+	}*/
 
 	void operator=(const Event& aux) {//this is an operator type "="
 		if (this == &aux) {
 			return;
 		}
 		this->eventId = aux.eventId;
-		if (this->dateAndTime) {
-			delete[] this->dateAndTime;
-			this->dateAndTime = nullptr;
-		}
-		if (aux.dateAndTime) {
-			this->dateAndTime = new char[strlen(aux.dateAndTime) + 1];
-			strcpy(this->dateAndTime, aux.dateAndTime);
-		}
-
-		if (this->name) {
-			delete[] this->name;
-			this->name = nullptr;
-		}
-		if (aux.name) {
-			this->name = new char[strlen(aux.name) + 1];
-			strcpy(this->name, aux.name);
-		}
+		this->dateAndTime = aux.dateAndTime;
+		this->name = aux.name;
 		this->location = aux.location;
 	}
 	bool operator==(const Event& e) const
@@ -94,22 +72,9 @@ public:
 		return false;
 	}
 	Event(const Event& aux1) {//this is a copy constructor
-		if (aux1.name != nullptr) {
-			this->name = new char[strlen(aux1.name) + 1];
-			memcpy(this->name, aux1.name, strlen(aux1.name) + 1);
-		}
-		else
-		{
-			this->name = nullptr;
-		}
+		this->name = aux1.name;
 		this->eventId = aux1.eventId;
-		if (aux1.dateAndTime != nullptr) {
-			this->dateAndTime = new char[strlen(aux1.dateAndTime) + 1];
-			memcpy(this->dateAndTime, aux1.dateAndTime, strlen(aux1.dateAndTime) + 1);
-		}
-		else {
-			this->dateAndTime = nullptr;
-		}
+		this->dateAndTime = aux1.dateAndTime;
 		this->location = aux1.location;
 	}
 	friend void operator<<(ostream& out, Event event);
@@ -129,10 +94,10 @@ public:
 };
 
 void operator<<(ostream& out, Event event) {//this is the operator "<<"
-	out << endl << "Event id: " << event.eventId << endl;
-	out << endl << "Event name: " << (event.name != nullptr ? string(event.name) : "No name") << endl;
-	out << endl << "Date and time: " << (event.dateAndTime != nullptr ? string(event.dateAndTime) : "No date and time") << endl;
-	out << endl << "Location is : " << event.location.getlocationName() << endl;
+	out << endl << "Event id: " << event.eventId;
+	out << endl << "Event name: " << (event.name.empty() ? string(event.name) : "No name");
+	out << endl << "Date and time: " << (event.dateAndTime.empty() ? string(event.dateAndTime) : "No date and time");
+	out << endl << "location is : " << event.location.getlocationName();
 }
 void operator>>(istream& in, Event& event) {//this is the operator">>"
 	cout << endl << "Location ID: ";

@@ -5,7 +5,7 @@ using namespace std;
 
 class Location {
 private:
-	char* locationName;
+	string locationName;
 	int noOfRows;
 	int noOfSeatsPerRow;
 	int totalNoOfSeats = 0;
@@ -13,7 +13,7 @@ private:
 	int availableNoOfSeats;
 
 public:
-	Location(int locationId, char* locationName, int noOfRows, int noOfSeatsPerRow) {// this is a constrcutor that can be made either this way, or by writing as we do at courses (exp:this->location=location) but i think is much more easier like that because in the setter I did a lot of things to include conditions of existence and also the getters 
+	Location(int locationId, string locationName, int noOfRows, int noOfSeatsPerRow) {// this is a constrcutor that can be made either this way, or by writing as we do at courses (exp:this->location=location) but i think is much more easier like that because in the setter I did a lot of things to include conditions of existence and also the getters 
 		this->setLocationId(locationId);
 		this->setLocationName(locationName);
 		this->setNoOfRows(noOfRows);
@@ -23,16 +23,16 @@ public:
 	}
 	Location() {
 		this->locationId = 0;//this is the default constructor
+		this->locationName = new char;
 	}
 
-	~Location() {//this is a destrcutor for our dyanmically alocated vector
-		delete[] this->locationName;
-	}
+	//~Location() {//this is a destrcutor for our dyanmically alocated vector
+	//}
 
 	int getNoOfRows() {//this is the getter for number of rows, those getters must be done in order to work with the variables later, in fact they return the variable, that's why we use the word "return"
 		return this->noOfRows;
 	}
-	char* getlocationName() const {
+	string getlocationName() const {
 		return this->locationName;
 	}
 	int getNoOfSeatsPerRow() {
@@ -61,16 +61,11 @@ public:
 			exit(1);
 		}
 	}
-	void setLocationName(char* locationName) {//this is also a setter that is computed by a vector of char allocated dynamic, this setter has the target to verifiy if it exists a location name in the array of characters, if exists, we also delete the old char and after that we create a new memory space and we copy by strcpy the old locationName in the new locationName
-		if (locationName == nullptr || strlen(locationName) == 0) {
+	void setLocationName(string locationName) {//this is also a setter that is computed by a vector of char allocated dynamic, this setter has the target to verifiy if it exists a location name in the array of characters, if exists, we also delete the old char and after that we create a new memory space and we copy by strcpy the old locationName in the new locationName
+		if (locationName.empty() || locationName.length() == 0) {
 			exit(1);
 		}
-		if (this->locationName != nullptr) {
-			delete[] this->locationName;
-		}
-		this->locationName = new char[strlen(locationName) + 1];
-		strcpy(this->locationName, locationName);
-
+		this->locationName = locationName;
 	}
 	void setNoOfSeatsPerRow(int noOfSeatsPerRow) {//as we done in the number of rows, we put a condition on number of seats per row to avoid confusion, because it is logic that we can't have a number of seats per row less than 1, because if we have, it means it doesn't exist, so we also put here a warning message if the staff put the number wrongly, and after that warning message we exit the code. If the number is correct, we made a getter in order to get the number of seats per row in order to can work later with this variable
 		if (noOfSeatsPerRow < 1) {
@@ -131,25 +126,11 @@ public:
 		this->noOfRows = aux.noOfRows;
 		this->noOfSeatsPerRow = aux.noOfSeatsPerRow;
 		this->totalNoOfSeats = aux.totalNoOfSeats;
-		if (this->locationName != nullptr) {
-			delete[] this->locationName;
-			this->locationName = nullptr;
-		}
-		if (aux.locationName) {
-			this->locationName = new char[strlen(aux.locationName) + 1];
-			strcpy(this->locationName, aux.locationName);
-		}
+		this->locationName = aux.locationName;
 	}
 
 	Location(const Location& aux1) {//this is a copy constructor
-		if (aux1.locationName != nullptr) {
-			this->locationName = new char[strlen(aux1.locationName) + 1];
-			memcpy(this->locationName, aux1.locationName, strlen(aux1.locationName) + 1);
-		}
-		else
-		{
-			this->locationName = nullptr;
-		}
+		this->locationName = aux1.locationName;
 		this->locationId = aux1.locationId;
 		this->availableNoOfSeats = aux1.availableNoOfSeats;
 		this->noOfRows = aux1.noOfRows;
@@ -174,12 +155,12 @@ public:
 
 };
 void operator<<(ostream& out, Location location) {//this is the operator "<<"
-	out << endl << "Location name: " << (location.locationName != nullptr ? string(location.locationName) : "No name") << endl;
-	out << endl << "Location id: " << location.locationId << endl;
-	out << endl << "Number of rows are :  " << location.noOfRows << endl;
-	out << endl << "Number of seats available are: " << location.availableNoOfSeats << endl;
-	out << endl << "The number of seats per row are: " << location.noOfSeatsPerRow << endl;
-	out << endl << "The total number of seats are: " << location.totalNoOfSeats << endl;
+	out << endl << "Location name: " << (location.locationName.empty() ? string(location.locationName) : "No name");
+	out << endl << "Location id: " << location.locationId;
+	out << endl << "Number of rows are :  " << location.noOfRows;
+	out << endl << "Number of seats available are: " << location.availableNoOfSeats;
+	out << endl << "The number of seats per row are: " << location.noOfSeatsPerRow;
+	out << endl << "The total number of seats are: " << location.totalNoOfSeats;
 }
 
 void operator>>(istream& in, Location& location) {//this is the operator">>"

@@ -98,19 +98,19 @@ void displayMenu(vector<Event>& events, vector<Location>& locations, vector<Tick
 	Event ev(evDate, evName, loc, 200);
 
 
-	//Ticket tWrite(ev, 40.0, false, 22);
-	//tickets.push_back(tWrite);
-	//fstream wf("ticket.dat", ios::out | ios::binary);
-	//if (!wf) {
-	//	cout << "Cannot open file!" << endl;
-	//	return;
-	//}
-	//wf.write((char*)&tWrite, sizeof(Ticket));
-	//wf.close();
-	//if (!wf.good()) {
-	//	cout << "Error occurred at writing time!" << endl;
-	//	return;
-	//}
+	Ticket tWrite(ev, 40.0, false, 22);
+	tickets.push_back(tWrite);
+	fstream wf("ticket.dat", ios::out | ios::binary);
+	if (!wf) {
+		cout << "Cannot open file!" << endl;
+		return;
+	}
+	wf.write((char*)&tWrite, sizeof(Ticket));
+	wf.close();
+	if (!wf.good()) {
+		cout << "Error occurred at writing time!" << endl;
+		return;
+	}
 
 	do {
 		displayMenuOptions();
