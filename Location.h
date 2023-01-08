@@ -146,7 +146,7 @@ public:
 
 };
 void operator<<(ostream& out, Location location) {//this is the operator "<<"
-	out << "----------" << endl;
+	out << endl << "----------" << endl;
 	out << "Location name: " << (!location.getLocationName().empty() ? location.getLocationName() : "No name") << endl;
 	out << "Location id: " << location.locationId << endl;
 	out << "The total number of seats are: " << location.getTotalNoOfSeats() << endl;
@@ -186,7 +186,7 @@ void operator>>(istream& in, Location& location) {//this is the operator">>"
 	int totalSeatsInAreas = 0;
 	vector<Area> areas;
 	do {
-		input.clear();
+		//input.clear();
 		//Ask player to create an area
 		std::cout << "Do you want to create an area?" << endl << "1. Yes" << endl << "0. No" << endl;
 		getline(in, input);
@@ -231,7 +231,7 @@ void operator>>(istream& in, Location& location) {//this is the operator">>"
 			//
 
 			//get number of seats per row
-			input.clear();
+			//input.clear();
 			std::cout << "Enter number of seats per row for General area: ";
 			//cin.clear();
 			getline(in, input);

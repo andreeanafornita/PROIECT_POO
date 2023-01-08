@@ -43,15 +43,15 @@ private:
 
 		crtID += distr(eng);
 
-		return crtID;
+		return abs(crtID);
 	}
 
 public:
-	Ticket(int eventID, float price, bool isUsed, int id) {//this is a constructor for class ticket, it may be implemented like this, with setters, or in a classic way:"this->variable=variable"
+	Ticket(int eventID, float price) {//this is a constructor for class ticket, it may be implemented like this, with setters, or in a classic way:"this->variable=variable"
 		this->setEventId(eventID);
 		this->setPrice(price);
-		this->setIsUsed(isUsed);
-		this->setId(id);
+		this->isUsed = false;
+		this->setId(generateID());
 	}
 	Ticket() {//this is the default constructor, uith initializer for the boolean variable in false
 		this->isUsed = false;
@@ -115,21 +115,18 @@ public:
 			this->price = price;
 		}
 	}
-	void setIsUsed(bool isUsed) {
-		if (!isUsed) {
-			this->isUsed = isUsed;
-		}
-		else {
-			cout << "The ticket is aleready used";
-			exit(1);
-		}
-	}
 	void setId(int id) {
 		this->id = id;
 	}
 
-	void useTicket(Ticket ticket) {//this is a static method by which we can make a ticket from "not used" to "used"
-		ticket.isUsed = true;
+	void useTicket() {//this is a static method by which we can make a ticket from "not used" to "used"
+		if (!this->isUsed) {
+			this->isUsed = true;
+		}
+		else {
+			cout << "The ticket is already used"<<endl;
+			exit(1);
+		}
 	}
 
 	bool checkTicket(Ticket ticket) {//this is a static method by which we can verify if a ticket is used or not
@@ -198,6 +195,6 @@ void operator>>(istream& in, Ticket& ticket) {//this is the input operator
 	in >> ticket.price;
 	cout << endl << "is it used?";
 	in >> ticket.isUsed;
-	ticket.useTicket(ticket);
+	ticket.useTicket();
 	ticket.checkTicket(ticket);
 }
