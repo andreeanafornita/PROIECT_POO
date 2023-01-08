@@ -1,18 +1,54 @@
 #pragma once
 #include <fstream>
 #include <string>
-#include "Event.h"//we should introduce on libraries those two, location and event because we want to include them in class "ticket"
+#include <random>
+#include "Event.h"
+#include "Area.h"
+
 class Ticket
 {
 private:
-	Event event;
+	int eventID;
+	int areaID;
 	float price;
 	bool isUsed;
 	int id;
 
+private:
+	int generateID() {
+		int crtID = 0;
+		//add the event ID and the area ID
+		crtID += this->eventID + this->areaID;
+		//then add the current time
+		//initialize time
+		time_t now = time(0);
+		tm ltm;
+		localtime_s(&ltm, &now);
+		//add year
+		crtID += 1900 + ltm.tm_year;
+		//add month
+		crtID += 1 + ltm.tm_mon;
+		//add day
+		crtID += ltm.tm_mday;
+		//add hour
+		crtID += ltm.tm_hour;
+		//add minute
+		crtID += ltm.tm_min;
+		//add second
+		crtID += ltm.tm_sec;
+
+		std::random_device rd;
+		std::mt19937 eng(rd());
+		std::uniform_int_distribution<> distr(0, INT_MAX/4);
+
+		crtID += distr(eng);
+
+		return crtID;
+	}
+
 public:
-	Ticket(Event event, float price, bool isUsed, int id) {//this is a constructor for class ticket, it may be implemented like this, with setters, or in a classic way:"this->variable=variable"
-		this->setEvent(event);
+	Ticket(int eventID, float price, bool isUsed, int id) {//this is a constructor for class ticket, it may be implemented like this, with setters, or in a classic way:"this->variable=variable"
+		this->setEventId(eventID);
 		this->setPrice(price);
 		this->setIsUsed(isUsed);
 		this->setId(id);
@@ -36,8 +72,24 @@ public:
 		return true;
 	}
 
-	Event getEvent() {//those 5 getters are initialized particulary for each variable with different types
-		return this->event;
+	static bool writeTicket(Ticket& ticket, string path) {
+		string fileName = path + "\\ticket" + to_string(ticket.id) + ".dat";
+		fstream wf(fileName, ios::out | ios::binary);
+		if (!wf) {
+			cout << "Cannot create file!" << endl;
+			return false;
+		}
+		wf.write((char*)&ticket, sizeof(Ticket));
+		wf.close();
+		if (!wf.good()) {
+			cout << "Error occurred when writing ticket with ID " << ticket.id << "!" << endl;
+			return false;
+		}
+		return true;
+	}
+
+	int getEventId() {//those 5 getters are initialized particulary for each variable with different types
+		return this->eventID;
 	}
 	float getPrice() {
 		return this->price;
@@ -48,8 +100,8 @@ public:
 	int getId() {
 		return this->id;
 	}
-	void setEvent(Event event) {//after we create getters, we must create setters for the variables who are coming  with conditions for existence 
-		this->event = event;
+	void setEventId(int eventID) {//after we create getters, we must create setters for the variables who are coming  with conditions for existence 
+		this->eventID = eventID;
 	}
 	void setPrice(float price) {
 		if (price < 0) {
@@ -76,34 +128,29 @@ public:
 		this->id = id;
 	}
 
-	static void useTicket(Ticket ticket) {//this is a static method by which we can make a ticket from "not used" to "used"
+	void useTicket(Ticket ticket) {//this is a static method by which we can make a ticket from "not used" to "used"
 		ticket.isUsed = true;
 	}
 
-	static bool checkTicket(Ticket ticket) {//this is a static method by which we can verify if a ticket is used or not
+	bool checkTicket(Ticket ticket) {//this is a static method by which we can verify if a ticket is used or not
 		return ticket.isUsed;
 	}
+
+	
 
 	void operator=(const Ticket& aux) {//this is an operator type "="
 		if (this == &aux) {
 			return;
 		}
-		this->event = aux.event;
+		this->eventID = aux.eventID;
 		this->price = aux.price;
 		this->isUsed = aux.isUsed;
 		this->id = aux.id;
+		this->areaID = areaID;
 	}
 	bool operator==(const Ticket& t) const
 	{
-		if (this->id == t.id && this->event == t.event)
-		{
-			return true;
-		}
-		return false;
-	}
-	bool operator==(int& id) const
-	{
-		if (this->id == id)
+		if (this->id == t.id && this->eventID == t.eventID)
 		{
 			return true;
 		}
@@ -111,10 +158,11 @@ public:
 	}
 	Ticket(const Ticket& aux1) {//this is a copy constructor
 
-		this->event = aux1.event;
+		this->eventID = aux1.eventID;
 		this->price = aux1.price;
 		this->isUsed = aux1.isUsed;
 		this->id = aux1.id;
+		this->areaID = areaID;
 	}
 	friend void operator<<(ostream& out, Ticket ticket);
 	friend void operator>>(istream& in, Ticket& ticket);
@@ -136,7 +184,7 @@ public:
 void operator<<(ostream& out, Ticket ticket) {//this is the output operator
 	out << "----------" << endl;
 	out << "id: " << ticket.id << endl;
-	out << "The event is: " << ticket.event;
+	out << "The eventID is: " << ticket.eventID;
 	out << endl << "price: " << ticket.price << endl;
 	out << "is it used? : " << ticket.isUsed << endl;
 	out << "----------" << endl;
@@ -145,7 +193,7 @@ void operator>>(istream& in, Ticket& ticket) {//this is the input operator
 	cout << endl << "id: ";
 	in >> ticket.id;
 	cout << endl << "event is: ";
-	in >> ticket.event;
+	in >> ticket.eventID;
 	cout << endl << "price: ";
 	in >> ticket.price;
 	cout << endl << "is it used?";
@@ -153,8 +201,3 @@ void operator>>(istream& in, Ticket& ticket) {//this is the input operator
 	ticket.useTicket(ticket);
 	ticket.checkTicket(ticket);
 }
-
-
-
-
-

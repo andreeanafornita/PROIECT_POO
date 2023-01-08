@@ -1,24 +1,16 @@
 #pragma once
 #include "LocationInterface.h"
+#include "Area.h"
 #include<iostream>
 #include<ctime>
 #include<vector>
 using namespace std;
 //this is a class named Location, it has a name, number of rows, number of seats per row, total number of seats that cand be easily found by multiplicatind the number of rows with number of seats per row, it also has an id who is attributed privately so no one can access the id, and available number of seats so we can decide if we can sell tickets more
 
-bool tryParse(std::string& input, int& output) {
-	try {
-		output = std::stoi(input);
-	}
-	catch (std::invalid_argument) {
-		return false;
-	}
-	return true;
-}
-
 class Location: virtual public LocationInterface {
 private:
 	int locationId;
+	vector<Area> areas;
 
 private:
 	int generateID() override {
@@ -49,8 +41,12 @@ private:
 	}
 
 public:
-	Location(string locationName, int noOfRows, int noOfSeatsPerRow): LocationInterface(locationName, noOfRows, noOfSeatsPerRow) {// this is a constrcutor that can be made either this way, or by writing as we do at courses (exp:this->location=location) but i think is much more easier like that because in the setter I did a lot of things to include conditions of existence and also the getters 
+	Location(string locationName, int totalNoOfSeats) : LocationInterface(locationName, totalNoOfSeats) {
 		this->locationId = -1;
+	}
+	Location(string locationName, int totalNoOfSeats, vector<Area> areas) : LocationInterface(locationName, totalNoOfSeats) {// this is a constrcutor that can be made either this way, or by writing as we do at courses (exp:this->location=location) but i think is much more easier like that because in the setter I did a lot of things to include conditions of existence and also the getters 
+		this->locationId = -1;
+		this->areas = areas;
 	}
 	Location() {
 		this->locationId = 0;//this is the default constructor
@@ -72,12 +68,47 @@ public:
 		this->locationId = crtID;
 	}
 
-	static void printLocation(Location location) {//this is a static method that has the target to print the location from class Location
-		cout << location;
+	static bool readLocation(Location& location, string fileName) {
+		ifstream fin(fileName, ios::out | ios::binary);
+		if (!fin) {
+			cout << "Cannot open " << fileName << " for reading!" << endl;
+			return false;
+		}
+		fin.read((char*)&location, sizeof(Location));
+		fin.close();
+		if (!fin.good()) {
+			cout << "Error occurred while reading " << fileName << "!" << endl;
+			return false;
+		}
+		return true;
+	}
+
+	static bool writeLocation(Location& loc, string path) {
+		string fileName = path + "\\location" + to_string(loc.locationId) + ".dat";
+		fstream wf(fileName, ios::out | ios::binary);
+		if (!wf) {
+			cout << "Cannot create file!" << endl;
+			return false;
+		}
+		wf.write((char*)&loc, sizeof(Location) + (sizeof(Area) * loc.getAreas().size()));
+		wf.close();
+		if (!wf.good()) {
+			cout << "Error occurred when writing location with ID " << loc.locationId << "!" << endl;
+			return false;
+		}
+		return true;
 	}
 
 	int getLocationId() const {
 		return this->locationId;
+	}
+
+	vector<Area> getAreas() const {
+		return this->areas;
+	}
+
+	void setAreas(vector<Area> areas) {
+		this->areas = areas;
 	}
 
 	void setLocationId(int locationId) {//this is a normal setter without any condition because the ID can be every integer 
@@ -89,28 +120,20 @@ public:
 			return;
 		}
 
-		this->setAvailableNoOfSeats(aux.getAvailableNoOfSeats());
 		this->locationId = aux.locationId;
-		this->setNoOfRows(aux.getNoOfRows());
-		this->setNoOfSeatsPerRow(aux.getNoOfSeatsPerRow());
 		this->setTotalNoOfSeats(aux.getTotalNoOfSeats());
 		this->setLocationName(aux.getLocationName());
+		this->setAreas(aux.getAreas());
 	}
 
 	Location(const Location& aux) {//this is a copy constructor
 		this->setLocationName(aux.getLocationName());
 		this->locationId = aux.locationId;
-		this->setAvailableNoOfSeats(aux.getAvailableNoOfSeats());
-		this->setNoOfRows(aux.getNoOfRows());
-		this->setNoOfSeatsPerRow(aux.getNoOfSeatsPerRow());
 		this->setTotalNoOfSeats(aux.getTotalNoOfSeats());
+		this->setAreas(aux.getAreas());
 	}
 	friend void operator<<(ostream& out, Location location);
 	friend void operator>>(istream& in, Location& location);
-
-	bool operator!() {//this is the "!" operator
-		return this->getAvailableNoOfSeats() == 0;
-	}
 
 	bool operator==(const Location& l) const
 	{
@@ -126,11 +149,13 @@ void operator<<(ostream& out, Location location) {//this is the operator "<<"
 	out << "----------" << endl;
 	out << "Location name: " << (!location.getLocationName().empty() ? location.getLocationName() : "No name") << endl;
 	out << "Location id: " << location.locationId << endl;
-	out << "Number of rows are :  " << location.getNoOfRows() << endl;
-	out << "Number of seats available are: " << location.getAvailableNoOfSeats() << endl;
-	out << "The number of seats per row are: " << location.getNoOfSeatsPerRow() << endl;
 	out << "The total number of seats are: " << location.getTotalNoOfSeats() << endl;
+	out << "--AREAS--" << endl;
+	for (const Area& area : location.getAreas()) {
+		out << area;
+	}
 	out << "----------" << endl;
+	//todo:print areas
 }
 
 void operator>>(istream& in, Location& location) {//this is the operator">>"
@@ -140,33 +165,107 @@ void operator>>(istream& in, Location& location) {//this is the operator">>"
 	getline(in, name);
 	//
 
-	//get number of rows
+	//get number of seats
 	string input;
-	int numRows;
-	std::cout << "Enter number of rows: ";
+	int numSeats;
+	std::cout << "Enter the total number of seats: ";
 	getline(in, input);
 
-	while (!tryParse(input, numRows)) {
+	while (!tryParse(input, numSeats)) {
 		std::cout << "Bad entry. Enter a NUMBER: ";
 		cin.clear();
 		getline(in, input);
 	}
 	//
 
-	//get number of seats per row
-	input.clear();
-	int numSeatsPerRow;
-	std::cout << "Enter number of seats per row: ";
-	//cin.clear();
-	getline(in, input);
+	Location loc(name, numSeats);
 
-	while (!tryParse(input, numSeatsPerRow)) {
-		std::cout << "Bad entry. Enter a NUMBER: ";
-		cin.clear();
+	//get all areas
+	//create areas
+	int option;
+	int totalSeatsInAreas = 0;
+	vector<Area> areas;
+	do {
+		input.clear();
+		//Ask player to create an area
+		std::cout << "Do you want to create an area?" << endl << "1. Yes" << endl << "0. No" << endl;
 		getline(in, input);
+		while (!tryParse(input, option)) {
+			std::cout << "Bad entry. Enter a NUMBER: ";
+			cin.clear();
+			getline(in, input);
+		}
+		if (option == 1) {
+			Area a;
+			in >> a;
+			if (totalSeatsInAreas + a.getTotalNoOfSeats() > loc.getTotalNoOfSeats()) {
+				std::cout << "There are too many seats in areas! Please enter a smaller number!" << endl;
+				std::cout << "There are " << loc.getTotalNoOfSeats() - totalSeatsInAreas << " seats left in \"General\" (without a specific area assigned)" << endl;
+			}
+			else {
+				totalSeatsInAreas += a.getTotalNoOfSeats();
+				a.generateUniqueID(loc.getLocationId(), areas);
+				areas.push_back(a);
+			}
+		}
+
+	} while (option != 0);
+	//if done, assign all seats left to "General" area
+	if (totalSeatsInAreas < loc.getTotalNoOfSeats()) {
+		//get number of rows
+		string input;
+		bool ok;
+		int numRows;
+		int numSeatsPerRow;
+
+		do {
+			ok = true;
+			std::cout << "Enter number of rows for General area: ";
+			getline(in, input);
+
+			while (!tryParse(input, numRows)) {
+				std::cout << "Bad entry. Enter a NUMBER: ";
+				cin.clear();
+				getline(in, input);
+			}
+			//
+
+			//get number of seats per row
+			input.clear();
+			std::cout << "Enter number of seats per row for General area: ";
+			//cin.clear();
+			getline(in, input);
+
+			while (!tryParse(input, numSeatsPerRow)) {
+				std::cout << "Bad entry. Enter a NUMBER: ";
+				cin.clear();
+				getline(in, input);
+			}
+			//
+			if (numRows * numSeatsPerRow > loc.getTotalNoOfSeats() - totalSeatsInAreas) {
+				std::cout << "There are not as many seats in this location! Please enter different numbers" << endl;
+				ok = false;
+			}
+		} while (!ok);
+		//get area entrance
+		string entrance;
+		std::cout << "Enter area entrance for General area: ";
+		getline(in, entrance);
+		//
+
+		//create the area and add the leftover seats to the total number of seats
+		Area a("General", numRows, numSeatsPerRow, "General access", entrance);
+		totalSeatsInAreas += a.getTotalNoOfSeats();
+		if (totalSeatsInAreas < loc.getTotalNoOfSeats()) {
+			a.setTotalNoOfSeats(a.getTotalNoOfSeats() + (loc.getTotalNoOfSeats() - totalSeatsInAreas));
+		}
+		//generate ID
+		a.generateUniqueID(loc.getLocationId(), areas);
+		areas.push_back(a);
 	}
+
 	//
-	Location loc(name, numRows, numSeatsPerRow);
+	loc.setAreas(areas);
 	location = loc;
 }
 

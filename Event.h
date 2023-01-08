@@ -7,7 +7,8 @@ private:
 	string dateAndTime;
 	string name;
 	int eventId;
-	Location location;//locatia din clasa Location
+	Location location;
+	int availableNoOfSeats;
 
 private:
 	int generateID() {
@@ -45,21 +46,25 @@ public:
 		this->setDateAndTime(dateAndTime);
 		this->setName(name);
 		this->setLocation(location);
+		this->availableNoOfSeats = this->location.getTotalNoOfSeats();
 	}
 	Event() {
 		this->eventId = 0;
 	}
-	string getDateAndTime(string dateAndTime) {
-		return this->dateAndTime = dateAndTime;
+	string getDateAndTime() {
+		return this->dateAndTime;
 	}
-	string getName(string name) {
-		return this->name = name;
+	string getName() {
+		return this->name;
 	}
-	int getEventId(int eventId) {
-		return this->eventId = eventId;
+	int getEventId() {
+		return this->eventId;
 	}
 	Location getLocation() {
 		return this->location;
+	}
+	int getAvailableNoOfSeats() const {
+		return this->availableNoOfSeats;
 	}
 	void setDateAndTime(string dateAndTime) {
 		if (dateAndTime.empty() || dateAndTime.length() == 0) {
@@ -82,6 +87,26 @@ public:
 	void setLocation(Location location) {//this is a setter for class location
 		this->location = location;
 	}
+	void setAvailableNoOfSeats(int availableNoOfSeats) {
+		if (availableNoOfSeats > 0) {
+			this->availableNoOfSeats = availableNoOfSeats;
+		}
+		else {
+			cout << "Available number of seats might be greater than 0";
+			exit(1);
+		}
+	}
+
+	bool checkAvailability() {//this is also a method by which we can found out if there are or are no more available seats
+		return this->availableNoOfSeats != 0;
+	}
+	void removeAvailableSeat(int seats) {//this is a setter who has a an integer variable "seats", who has the target to remove available seats if the client who wants a number of seats is less or equal than the available number of seats. if not, it will appear a warning message to the user
+		if (this->availableNoOfSeats < seats) {
+			cout << "There are less available seats than specified";
+			exit(1);
+		}
+		this->availableNoOfSeats = this->availableNoOfSeats - seats;
+	}
 	/*~Event() {
 	}*/
 
@@ -99,6 +124,46 @@ public:
 			}
 		}
 		this->eventId = crtID;
+	}
+
+	static Event* getEventFromID(int eventID, vector<Event>& events) {
+		for (Event& ev : events) {
+			if (ev.getEventId() == eventID) {
+				return &ev;
+			}
+		}
+		return nullptr;
+	}
+
+	static bool readEvent(Event& event, string fileName) {
+		ifstream fin(fileName, ios::out | ios::binary);
+		if (!fin) {
+			cout << "Cannot open " << fileName << " for reading!" << endl;
+			return false;
+		}
+		fin.read((char*)&event, sizeof(Event));
+		fin.close();
+		if (!fin.good()) {
+			cout << "Error occurred while reading " << fileName << "!" << endl;
+			return false;
+		}
+		return true;
+	}
+
+	static bool writeEvent(Event& ev, string path) {
+		string fileName = path + "\\event" + to_string(ev.eventId) + ".dat";
+		fstream wf(fileName, ios::out | ios::binary);
+		if (!wf) {
+			cout << "Cannot create file!" << endl;
+			return false;
+		}
+		wf.write((char*)&ev, sizeof(Event));
+		wf.close();
+		if (!wf.good()) {
+			cout << "Error occurred when writing event with ID " << ev.eventId << "!" << endl;
+			return false;
+		}
+		return true;
 	}
 
 	void operator=(const Event& aux) {//this is an operator type "="
@@ -128,16 +193,12 @@ public:
 	friend void operator>>(istream& in, Event& event);
 
 	bool operator!() {//this is the "!" operator
-		return this->eventId == 0;
+		return this->getAvailableNoOfSeats() == 0;
 	}
+
 	bool operator>(Event& event) {
 		return this->eventId > event.eventId;
 	}
-
-	static void printEvent(Event event) {//this is a static method that has the target to print the location from class Location
-		cout << event;
-	}
-
 };
 
 void operator<<(ostream& out, Event event) {//this is the operator "<<"
@@ -146,6 +207,7 @@ void operator<<(ostream& out, Event event) {//this is the operator "<<"
 	out << endl << "Event name: " << (!event.name.empty() ? string(event.name) : "No name") << endl;
 	out << endl << "Date and time: " << (!event.dateAndTime.empty() ? string(event.dateAndTime) : "No date and time") << endl;
 	out << endl << "Location is : " << event.location.getLocationName() << endl;
+	out << "Number of seats available are: " << event.getAvailableNoOfSeats() << endl;
 	out << "----------" << endl;
 }
 void operator>>(istream& in, Event& event) {//this is the operator">>"

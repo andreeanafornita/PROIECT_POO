@@ -10,6 +10,10 @@
 using namespace std;
 namespace fs = std::filesystem;
 
+const string locationsPathString = ".\\data\\locations";
+const string eventsPathString = ".\\data\\events";
+const string ticketsPathString = ".\\data\\tickets";
+
 void displayMenuOptions() {
 	cout << "MENIU:" << endl;
 	cout << "1.See all events" << endl;
@@ -51,7 +55,7 @@ bool checkTicket(vector<Ticket>& tickets, int id) {
 Location checkLocation(vector<Location>& locations, string name, bool& found) {
 	found = false;
 	for (Location& loc : locations) {
-		//cout << loc;
+		cout << loc;
 		if (loc.getLocationName() == name) {
 			found = true;
 			return loc;
@@ -71,42 +75,35 @@ Location checkLocation(vector<Location>& locations, int id, bool& found) {
 	found = false;
 }
 
+bool checkDirectory(fs::path path) {
+	if (fs::is_directory(path)) {
+		cout << "Found directory at \"" << path.u8string() << "\". Reading contents..." << endl;
+	}
+	else {
+		cout << "Did not find diretory at \"" << path.u8string() << "\". Creating it ..." << endl;
+		if (!fs::create_directory(path)) {
+			cout << "Could not create directory named \"" << path.u8string() << "\". Exiting..." << endl;
+			return false;
+		}
+		else {
+			cout << "Successfully created directory \"" << path.u8string() << "\"" << endl;
+		}
+	}
+	return true;
+}
+
 void displayMenu(vector<Event>& events, vector<Location>& locations, vector<Ticket>& tickets) {
 	int option;
-
-	//char locn[] = "Stadion";
-	//char* locName = new char[strlen(locn) + 1];
-	//locName = locn;
-	//Location loc(locName, 4000, 20);
-
-	//char evd[] = "10-10-2022 10:30";
-	//char evn[] = "Festival";
-	//char* evDate = new char[strlen(evd) + 1];
-	//evDate = evd;
-	//char* evName = new char[strlen(evn) + 1];
-	//evName = evn;
-	//Event ev(evDate, evName, loc);
-
-
-	//Ticket tWrite(ev, 40.0, false, 22);
-	//tickets.push_back(tWrite);
-	//fstream wf("ticket.dat", ios::out | ios::binary);
-	//if (!wf) {
-	//	cout << "Cannot open file!" << endl;
-	//	return;
-	//}
-	//wf.write((char*)&tWrite, sizeof(Ticket));
-	//wf.close();
-	//if (!wf.good()) {
-	//	cout << "Error occurred at writing time!" << endl;
-	//	return;
-	//}
 
 	do {
 		displayMenuOptions();
 		string strOpt;
 		getline(std::cin, strOpt);
-		option = std::stoi(strOpt);
+		while (!tryParse(strOpt, option)) {
+			std::cout << "Bad entry. Enter a NUMBER: ";
+			cin.clear();
+			getline(std::cin, strOpt);
+		}
 		if (option == 1) {
 			//see all events
 			for (Event ev : events) {
@@ -241,6 +238,9 @@ void displayMenu(vector<Event>& events, vector<Location>& locations, vector<Tick
 			//generate an ID for the event
 			ev.generateUniqueID(events);
 
+			//write the event to file
+			Event::writeEvent(ev, eventsPathString);
+
 			events.push_back(ev);
 
 		}
@@ -254,8 +254,9 @@ void displayMenu(vector<Event>& events, vector<Location>& locations, vector<Tick
 			//initialize the ID
 			loc.generateUniqueID(locations);
 
+			//write the location to file
+			Location::writeLocation(loc, locationsPathString);
 			locations.push_back(loc);
-			//todo: create the location and add it to vector
 		}
 		else if (option != 0) {
 			std::cout << "Invalid choice" << endl;
@@ -263,41 +264,47 @@ void displayMenu(vector<Event>& events, vector<Location>& locations, vector<Tick
 	} while (option != 0);
 }
 
-bool loadTickets(vector<Event>& events, vector<Location>& locations, vector<Ticket>& tickets) {
-	//check if a directory named tickets exists
-	fs::path dirPath = string(".\\tickets");
-
-	if (fs::is_directory(dirPath)) {
-		cout << "Found directory named \"tickets\". Reading tickets..." << endl;
-	}
-	else {
-		cout << "Did not find diretory named \"tickets\". Creating it ..." << endl;
-		if (!fs::create_directory(dirPath)) {
-			cout << "Could not create directory named \"tickets\". Exiting..." << endl;
-			exit(1);
+bool loadLocations(fs::path path, vector<Location>& locations) {
+	for (const auto& dirEntry : fs::recursive_directory_iterator(path)) {
+		string path = string(dirEntry.path().u8string());
+		//std::cout << string(dirEntry.path().u8string()) << endl;
+		Location l;
+		if (Location::readLocation(l, string(dirEntry.path().u8string()))) {
+			//successfully read location - add it to the list
+			locations.push_back(l);
 		}
 		else {
-			cout << "Successfully created directory \"tickets\"" << endl;
+			//did not succesfully read location
 		}
-		return false;
 	}
+	return true;
+}
 
-	//get all files in that directory
-	for (const auto& dirEntry : fs::recursive_directory_iterator(dirPath)) {
+bool loadEvents(fs::path path, vector<Event>& events) {
+	for (const auto& dirEntry : fs::recursive_directory_iterator(path)) {
+		string path = string(dirEntry.path().u8string());
+		//std::cout << string(dirEntry.path().u8string()) << endl;
+		Event e;
+		if (Event::readEvent(e, string(dirEntry.path().u8string()))) {
+			//successfully read event - add it to the list
+			events.push_back(e);
+		}
+		else {
+			//did not succesfully read event
+		}
+	}
+	return true;
+}
+
+bool loadTickets(fs::path path, vector<Ticket>& tickets) {
+
+	for (const auto& dirEntry : fs::recursive_directory_iterator(path)) {
 		string path = string(dirEntry.path().u8string());
 		//std::cout << string(dirEntry.path().u8string()) << endl;
 		Ticket t;
 		if (Ticket::readTicket(t, string(dirEntry.path().u8string()))) {
 			//successfully read ticket - add it to the list
 			tickets.push_back(t);
-			//load event in vector of events - if it does not already exist
-			if (find(events.begin(), events.end(), t.getEvent()) != events.end()) {
-				events.push_back(t.getEvent());
-			}
-			//load location in vector of locations - if it does not already exist
-			if (find(locations.begin(), locations.end(), t.getEvent().getLocation()) != locations.end()) {
-				locations.push_back(t.getEvent().getLocation());
-			}
 		}
 		else {
 			//did not succesfully read ticket
@@ -306,28 +313,42 @@ bool loadTickets(vector<Event>& events, vector<Location>& locations, vector<Tick
 	return true;
 }
 
+void loadData(vector<Location>& locations, vector<Event>& events, vector<Ticket>& tickets) {
+	//check if a directory named data exists
+	fs::path dataPath = string(".\\data");
+	if (!checkDirectory(dataPath)) {
+		exit(1);
+	}
+	//get all files in that directory
+	fs::path ticketsPath = ticketsPathString;
+	if (!checkDirectory(ticketsPath)) {
+		exit(1);
+	}
+	fs::path eventsPath = eventsPathString;
+	if (!checkDirectory(eventsPath)) {
+		exit(1);
+	}
+	fs::path locationsPath = locationsPathString;
+	if (!checkDirectory(locationsPath)) {
+		exit(1);
+	}
+
+	loadLocations(locationsPath, locations);
+	loadEvents(eventsPath, events);
+	loadTickets(ticketsPath, tickets);
+}
+
 int main(int argc, char* argv[]) {
 	vector<Event> events;
 	vector<Location> locations;
 	vector<Ticket> tickets;
 
-	//Location loc;
-
-	//cin>>loc;
-
-	displayMenu(events, locations, tickets);
-
 	//load tickets
-	if (loadTickets(events, locations, tickets)) {
-		cout << "Successfully loaded " << tickets.size() << " tickets and " << events.size() << " events" << endl;
-	}
-	else {
-		cout << "Could not load tickets";
-	}
+	loadData(locations, events, tickets);
 
 	//read commands from file - if file is needed
 	vector<int> commands;
-	//in commands we store the option and all necessary arguments for each option
+	//in commands we store the options and all necessary arguments for each option
 	if (argc == 2) {
 		ifstream fin(argv[1]);
 
@@ -348,11 +369,6 @@ int main(int argc, char* argv[]) {
 		displayMenu(events, locations, tickets);
 		return 0;
 	}
-
-	//TESTING
-	//for (auto command : commands) {
-	//	cout << command << " ";
-	//}
 
 	return 0;
 }
