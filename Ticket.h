@@ -134,11 +134,12 @@ public:
 };
 
 void operator<<(ostream& out, Ticket ticket) {//this is the output operator
-	out << endl << "id: " << ticket.id;
-	out << endl << "The event is: " << ticket.event;
-	out << endl << "price: " << ticket.price;
-	out << endl << "is it used? : " << ticket.isUsed;
-
+	out << "----------" << endl;
+	out << "id: " << ticket.id << endl;
+	out << "The event is: " << ticket.event;
+	out << endl << "price: " << ticket.price << endl;
+	out << "is it used? : " << ticket.isUsed << endl;
+	out << "----------" << endl;
 }
 void operator>>(istream& in, Ticket& ticket) {//this is the input operator
 	cout << endl << "id: ";

@@ -1,147 +1,115 @@
 #pragma once
+#include "LocationInterface.h"
 #include<iostream>
+#include<ctime>
+#include<vector>
 using namespace std;
 //this is a class named Location, it has a name, number of rows, number of seats per row, total number of seats that cand be easily found by multiplicatind the number of rows with number of seats per row, it also has an id who is attributed privately so no one can access the id, and available number of seats so we can decide if we can sell tickets more
 
-class Location {
+bool tryParse(std::string& input, int& output) {
+	try {
+		output = std::stoi(input);
+	}
+	catch (std::invalid_argument) {
+		return false;
+	}
+	return true;
+}
+
+class Location: virtual public LocationInterface {
 private:
-	string locationName;
-	int noOfRows;
-	int noOfSeatsPerRow;
-	int totalNoOfSeats = 0;
 	int locationId;
-	int availableNoOfSeats;
+
+private:
+	int generateID() override {
+		int crtID = 0;
+		//add all ASCII values of chars in name of venue
+		for (char c : this->getLocationName()) {
+			crtID += int(c);
+		}
+		//then add the current time
+		//initialize time
+		time_t now = time(0);
+		tm ltm;
+		localtime_s(&ltm, &now);
+		//add year
+		crtID += 1900 + ltm.tm_year;
+		//add month
+		crtID += 1 + ltm.tm_mon;
+		//add day
+		crtID += ltm.tm_mday;
+		//add hour
+		crtID += ltm.tm_hour;
+		//add minute
+		crtID += ltm.tm_min;
+		//add second
+		crtID += ltm.tm_sec;
+
+		return crtID;
+	}
 
 public:
-	Location(int locationId, string locationName, int noOfRows, int noOfSeatsPerRow) {// this is a constrcutor that can be made either this way, or by writing as we do at courses (exp:this->location=location) but i think is much more easier like that because in the setter I did a lot of things to include conditions of existence and also the getters 
-		this->setLocationId(locationId);
-		this->setLocationName(locationName);
-		this->setNoOfRows(noOfRows);
-		this->setNoOfSeatsPerRow(noOfSeatsPerRow);
-		this->calculateTotalNoOfSeats();
-		this->calculateAvailableNoOfSeats();
+	Location(string locationName, int noOfRows, int noOfSeatsPerRow): LocationInterface(locationName, noOfRows, noOfSeatsPerRow) {// this is a constrcutor that can be made either this way, or by writing as we do at courses (exp:this->location=location) but i think is much more easier like that because in the setter I did a lot of things to include conditions of existence and also the getters 
+		this->locationId = -1;
 	}
 	Location() {
 		this->locationId = 0;//this is the default constructor
-		this->locationName = new char;
 	}
 
-	//~Location() {//this is a destrcutor for our dyanmically alocated vector
-	//}
+	void generateUniqueID(const vector<Location>& locations) {
+		bool isUnique = false;
+		int crtID;
 
-	int getNoOfRows() {//this is the getter for number of rows, those getters must be done in order to work with the variables later, in fact they return the variable, that's why we use the word "return"
-		return this->noOfRows;
-	}
-	string getlocationName() const {
-		return this->locationName;
-	}
-	int getNoOfSeatsPerRow() {
-		return this->noOfSeatsPerRow;
-	}
-	int getTotalNoOfSeats() {
-		return this->totalNoOfSeats;
-	}
-	int getLocationId() {
-		return this->locationId;
-	}
-	int getAvailableNoOfSeats() {
-		return this->availableNoOfSeats;
+		while (!isUnique) {
+			isUnique = true;
+			crtID = generateID();
+			for (const Location& location : locations) {
+				if (location.getLocationId() == crtID) {
+					isUnique = false;
+				}
+			}
+		}
+		this->locationId = crtID;
 	}
 
 	static void printLocation(Location location) {//this is a static method that has the target to print the location from class Location
 		cout << location;
 	}
-	void setNoOfRows(int noOfRows) {//this is a setter which has a condition which says that the  number of rows can't be less than 0, because it means it doesn't exist, so if we put a number less than 0, will appear a warning message and the program will exit the code
-		if (noOfRows > 0) {
-			this->noOfRows = noOfRows;
-		}
-		else
-		{
-			cout << "no of rows needs to be greater than 0";
-			exit(1);
-		}
-	}
-	void setLocationName(string locationName) {//this is also a setter that is computed by a vector of char allocated dynamic, this setter has the target to verifiy if it exists a location name in the array of characters, if exists, we also delete the old char and after that we create a new memory space and we copy by strcpy the old locationName in the new locationName
-		if (locationName.empty() || locationName.length() == 0) {
-			exit(1);
-		}
-		this->locationName = locationName;
-	}
-	void setNoOfSeatsPerRow(int noOfSeatsPerRow) {//as we done in the number of rows, we put a condition on number of seats per row to avoid confusion, because it is logic that we can't have a number of seats per row less than 1, because if we have, it means it doesn't exist, so we also put here a warning message if the staff put the number wrongly, and after that warning message we exit the code. If the number is correct, we made a getter in order to get the number of seats per row in order to can work later with this variable
-		if (noOfSeatsPerRow < 1) {
-			cout << "number of seats must be greater or equal than 1";
-			exit(1);
-		}
-		else {
-			this->noOfSeatsPerRow = noOfSeatsPerRow;
-		}
-	}
-	void calculateTotalNoOfSeats() {//this is a method that helps us to calculate the total number of seats by simply multiplying number of seats per row with number of rows
-		if (this->noOfSeatsPerRow > 0 && this->noOfRows > 0) {
-			this->totalNoOfSeats = noOfSeatsPerRow * noOfRows;
-		}
 
+	int getLocationId() const {
+		return this->locationId;
 	}
-	void setTotalNoOfSeats(int totalNoOfSeats) {//this is a setter for total number of seats. we also put here a condition for numbers because it can't be less or equal to 0, because it means it doesn't exists, so if it doesn't exists, we put a warning message to inform the user
-		if (totalNoOfSeats > 0) {
-			this->totalNoOfSeats = totalNoOfSeats;
-		}
-		else {
-			cout << "Total number of seats might be greater than 0";
-			exit(1);
-		}
-	}
-	void setAvailableNoOfSeats(int availableNoOfSeats) {// this is also a setter that check if the available number of seats is greater than 0, becuase as I said before, if it is less than 0 it means it doesn't exists so the code will exit and will appear a warning message
-		if (availableNoOfSeats > 0) {
-			this->availableNoOfSeats = availableNoOfSeats;
-		}
-		else {
-			cout << "Available number of seats might be greater than 0";
-		}
-	}
+
 	void setLocationId(int locationId) {//this is a normal setter without any condition because the ID can be every integer 
 		this->locationId = locationId;
-	}
-	void calculateAvailableNoOfSeats() {//this is a method that can help us to find out the seats that are no more occupied
-		this->availableNoOfSeats = this->totalNoOfSeats;
-	}
-
-	bool checkAvailability() {//this is also a method by which we can found out if there are or are no more available seats
-		return this->availableNoOfSeats != 0;
-	}
-	void removeAvailableSeat(int seats) {//this is a setter who has a an integer variable "seats", who has the target to remove available seats if the client who wants a number of seats is less or equal than the available number of seats. if not, it will appear a warning message to the user
-		if (this->availableNoOfSeats < seats) {
-			cout << "There are less available seats than specified";
-			exit(1);
-		}
-		this->availableNoOfSeats = this->availableNoOfSeats - seats;
 	}
 
 	void operator=(const Location& aux) {//this is an operator type "="
 		if (this == &aux) {
 			return;
 		}
-		this->availableNoOfSeats = aux.availableNoOfSeats;
+
+		this->setAvailableNoOfSeats(aux.getAvailableNoOfSeats());
 		this->locationId = aux.locationId;
-		this->noOfRows = aux.noOfRows;
-		this->noOfSeatsPerRow = aux.noOfSeatsPerRow;
-		this->totalNoOfSeats = aux.totalNoOfSeats;
-		this->locationName = aux.locationName;
+		this->setNoOfRows(aux.getNoOfRows());
+		this->setNoOfSeatsPerRow(aux.getNoOfSeatsPerRow());
+		this->setTotalNoOfSeats(aux.getTotalNoOfSeats());
+		this->setLocationName(aux.getLocationName());
 	}
 
-	Location(const Location& aux1) {//this is a copy constructor
-		this->locationName = aux1.locationName;
-		this->locationId = aux1.locationId;
-		this->availableNoOfSeats = aux1.availableNoOfSeats;
-		this->noOfRows = aux1.noOfRows;
-		this->noOfSeatsPerRow = aux1.noOfSeatsPerRow;
-		this->totalNoOfSeats = aux1.totalNoOfSeats;
+	Location(const Location& aux) {//this is a copy constructor
+		this->setLocationName(aux.getLocationName());
+		this->locationId = aux.locationId;
+		this->setAvailableNoOfSeats(aux.getAvailableNoOfSeats());
+		this->setNoOfRows(aux.getNoOfRows());
+		this->setNoOfSeatsPerRow(aux.getNoOfSeatsPerRow());
+		this->setTotalNoOfSeats(aux.getTotalNoOfSeats());
 	}
 	friend void operator<<(ostream& out, Location location);
 	friend void operator>>(istream& in, Location& location);
 
 	bool operator!() {//this is the "!" operator
-		return this->availableNoOfSeats == 0;
+		return this->getAvailableNoOfSeats() == 0;
 	}
 
 	bool operator==(const Location& l) const
@@ -155,37 +123,53 @@ public:
 
 };
 void operator<<(ostream& out, Location location) {//this is the operator "<<"
-	out << endl << "Location name: " << (location.locationName.empty() ? string(location.locationName) : "No name");
-	out << endl << "Location id: " << location.locationId;
-	out << endl << "Number of rows are :  " << location.noOfRows;
-	out << endl << "Number of seats available are: " << location.availableNoOfSeats;
-	out << endl << "The number of seats per row are: " << location.noOfSeatsPerRow;
-	out << endl << "The total number of seats are: " << location.totalNoOfSeats;
+	out << "----------" << endl;
+	out << "Location name: " << (!location.getLocationName().empty() ? location.getLocationName() : "No name") << endl;
+	out << "Location id: " << location.locationId << endl;
+	out << "Number of rows are :  " << location.getNoOfRows() << endl;
+	out << "Number of seats available are: " << location.getAvailableNoOfSeats() << endl;
+	out << "The number of seats per row are: " << location.getNoOfSeatsPerRow() << endl;
+	out << "The total number of seats are: " << location.getTotalNoOfSeats() << endl;
+	out << "----------" << endl;
 }
 
 void operator>>(istream& in, Location& location) {//this is the operator">>"
-	cout << endl << "Location ID: ";
-	in >> location.locationId;
-	cout << endl << "Name: ";
-	char buffer[100];
-	in >> buffer;
-	location.setLocationName(buffer);
-	cout << endl << "Number of rows are: ";
-	int noOfRows = 0;
-	in >> noOfRows;
-	location.setNoOfRows(noOfRows);
-	cout << endl << "Number of seats per rows are: ";
-	int noOfSeatsPerRow = 0;
-	in >> noOfSeatsPerRow;
-	location.setNoOfSeatsPerRow(noOfSeatsPerRow);
-	location.calculateTotalNoOfSeats();
-	location.calculateAvailableNoOfSeats();
+	//get name
+	string name;
+	std::cout << "Enter location name: ";
+	getline(in, name);
+	//
 
+	//get number of rows
+	string input;
+	int numRows;
+	std::cout << "Enter number of rows: ";
+	getline(in, input);
+
+	while (!tryParse(input, numRows)) {
+		std::cout << "Bad entry. Enter a NUMBER: ";
+		cin.clear();
+		getline(in, input);
+	}
+	//
+
+	//get number of seats per row
+	input.clear();
+	int numSeatsPerRow;
+	std::cout << "Enter number of seats per row: ";
+	//cin.clear();
+	getline(in, input);
+
+	while (!tryParse(input, numSeatsPerRow)) {
+		std::cout << "Bad entry. Enter a NUMBER: ";
+		cin.clear();
+		getline(in, input);
+	}
+	//
+	Location loc(name, numRows, numSeatsPerRow);
+	location = loc;
 }
 
 bool operator==(Location& location1, Location& location2) {//this is the operator "=="
 	return location1.getLocationId() == location2.getLocationId();
 }
-
-
-

@@ -22,16 +22,6 @@ void displayMenuOptions() {
 	cout << "0.Exit" << endl;
 }
 
-bool tryParse(std::string& input, int& output) {
-	try {
-		output = std::stoi(input);
-	}
-	catch (std::invalid_argument) {
-		return false;
-	}
-	return true;
-}
-
 bool useTicket(vector<Ticket>& tickets, int id) {
 	for (Ticket& t : tickets) {
 		if (t.getId() == id) {
@@ -58,64 +48,64 @@ bool checkTicket(vector<Ticket>& tickets, int id) {
 	}
 }
 
-bool checkLocation(vector<Location>& locations, string name) {
-	
+Location checkLocation(vector<Location>& locations, string name, bool& found) {
+	found = false;
 	for (Location& loc : locations) {
-		if (loc.getlocationName() == name) {
-			cout << loc;
-			return true;
+		//cout << loc;
+		if (loc.getLocationName() == name) {
+			found = true;
+			return loc;
 		}
 	}
-
-	return false;
 }
 
-bool checkLocation(vector<Location>& locations, int id) {
+Location checkLocation(vector<Location>& locations, int id, bool& found) {
 	for (Location& loc : locations) {
+		//cout << loc;
 		if (loc.getLocationId() == id) {
-			cout << loc;
-			return true;
+			found = true;
+			return loc;
 		}
 	}
 
-	return false;
+	found = false;
 }
 
 void displayMenu(vector<Event>& events, vector<Location>& locations, vector<Ticket>& tickets) {
 	int option;
 
-	char locn[] = "Stadion";
-	char* locName = new char[strlen(locn) + 1];
-	locName = locn;
-	Location loc(22, locName, 4000, 20);
+	//char locn[] = "Stadion";
+	//char* locName = new char[strlen(locn) + 1];
+	//locName = locn;
+	//Location loc(locName, 4000, 20);
 
-	char evd[] = "10-10-2022 10:30";
-	char evn[] = "Festival";
-	char* evDate = new char[strlen(evd) + 1];
-	evDate = evd;
-	char* evName = new char[strlen(evn) + 1];
-	evName = evn;
-	Event ev(evDate, evName, loc, 200);
+	//char evd[] = "10-10-2022 10:30";
+	//char evn[] = "Festival";
+	//char* evDate = new char[strlen(evd) + 1];
+	//evDate = evd;
+	//char* evName = new char[strlen(evn) + 1];
+	//evName = evn;
+	//Event ev(evDate, evName, loc);
 
 
-	Ticket tWrite(ev, 40.0, false, 22);
-	tickets.push_back(tWrite);
-	fstream wf("ticket.dat", ios::out | ios::binary);
-	if (!wf) {
-		cout << "Cannot open file!" << endl;
-		return;
-	}
-	wf.write((char*)&tWrite, sizeof(Ticket));
-	wf.close();
-	if (!wf.good()) {
-		cout << "Error occurred at writing time!" << endl;
-		return;
-	}
+	//Ticket tWrite(ev, 40.0, false, 22);
+	//tickets.push_back(tWrite);
+	//fstream wf("ticket.dat", ios::out | ios::binary);
+	//if (!wf) {
+	//	cout << "Cannot open file!" << endl;
+	//	return;
+	//}
+	//wf.write((char*)&tWrite, sizeof(Ticket));
+	//wf.close();
+	//if (!wf.good()) {
+	//	cout << "Error occurred at writing time!" << endl;
+	//	return;
+	//}
 
 	do {
 		displayMenuOptions();
 		string strOpt;
-		std::getline(std::cin, strOpt);
+		getline(std::cin, strOpt);
 		option = std::stoi(strOpt);
 		if (option == 1) {
 			//see all events
@@ -137,14 +127,23 @@ void displayMenu(vector<Event>& events, vector<Location>& locations, vector<Tick
 			cin.clear();
 			getline(std::cin, input);
 
+			bool found;
 			if (!tryParse(input, id)) {
-				if (!checkLocation(locations, input)) {
+				Location loc = checkLocation(locations, input, found);
+				if (!found) {
 					std::cout << "Could not find any location with name " << input << endl;
+				}
+				else {
+					std::cout << loc;
 				}
 			}
 			else {
-				if (!checkLocation(locations, id)) {
+				Location loc = checkLocation(locations, id, found);
+				if (!found) {
 					std::cout << "Could not find any location with id " << id << endl;
+				}
+				else {
+					std::cout << loc;
 				}
 			}
 		}
@@ -217,61 +216,45 @@ void displayMenu(vector<Event>& events, vector<Location>& locations, vector<Tick
 			cin.clear();
 			getline(std::cin, input);
 
+			//try to find location by id/name
+			Location loc;
+			bool found;
 			if (!tryParse(input, id)) {
-				if (!checkLocation(locations, input)) {
+				loc = checkLocation(locations, input, found);
+				if (!found) {
 					std::cout << "Could not find any location with name " << input << endl;
 					continue;
 				}
 			}
 			else {
-				if (!checkLocation(locations, id)) {
+				Location loc = checkLocation(locations, id, found);
+				if (!found) {
 					std::cout << "Could not find any location with id " << id << endl;
 					continue;
 				}
 			}
 			//
 
-			//todo: create event and add it to events vector
+			//create the event
+			Event ev(dateAndTime, name, loc);
+
+			//generate an ID for the event
+			ev.generateUniqueID(events);
+
+			events.push_back(ev);
 
 		}
 		else if (option == 7) {
 			//create a location
-			
-			//get name
-			string name;
-			std::cout << "Enter location name: ";
-			cin.clear();
-			getline(std::cin, name);
-			//
-			
-			//get number of rows
-			string input;
-			int numRows;
-			std::cout << "Enter number of rows: ";
-			cin.clear();
-			getline(std::cin, input);
+			Location loc;
 
-			while (!tryParse(input, numRows)) {
-				std::cout << "Bad entry. Enter a NUMBER: ";
-				cin.clear();
-				getline(std::cin, input);
-			}
-			//
+			//read the details about the location
+			std::cin >> loc;
 
-			//get number of seats per row
-			input.clear();
-			int numSeatsPerRow;
-			std::cout << "Enter number of seats per row: ";
-			cin.clear();
-			getline(std::cin, input);
+			//initialize the ID
+			loc.generateUniqueID(locations);
 
-			while (!tryParse(input, numSeatsPerRow)) {
-				std::cout << "Bad entry. Enter a NUMBER: ";
-				cin.clear();
-				getline(std::cin, input);
-			}
-			//
-
+			locations.push_back(loc);
 			//todo: create the location and add it to vector
 		}
 		else if (option != 0) {
@@ -327,6 +310,10 @@ int main(int argc, char* argv[]) {
 	vector<Event> events;
 	vector<Location> locations;
 	vector<Ticket> tickets;
+
+	//Location loc;
+
+	//cin>>loc;
 
 	displayMenu(events, locations, tickets);
 

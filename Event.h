@@ -8,10 +8,41 @@ private:
 	string name;
 	int eventId;
 	Location location;//locatia din clasa Location
+
+private:
+	int generateID() {
+		int crtID = 0;
+		//add all ASCII values of chars in name of event
+		for (char c : this->name) {
+			crtID += int(c);
+		}
+		//then add the current time
+		//initialize time
+		time_t now = time(0);
+		tm ltm;
+		localtime_s(&ltm, &now);
+		//add year
+		crtID += 1900 + ltm.tm_year;
+		//add month
+		crtID += 1 + ltm.tm_mon;
+		//add day
+		crtID += ltm.tm_mday;
+		//add hour
+		crtID += ltm.tm_hour;
+		//add minute
+		crtID += ltm.tm_min;
+		//add second
+		crtID += ltm.tm_sec;
+
+		//finally add the location ID to it
+		crtID += this->location.getLocationId();
+
+		return crtID;
+	}
+
 public:
-	Event(string dateAndTime, string name, Location location,int eventId) {
+	Event(string dateAndTime, string name, Location location) {
 		this->setDateAndTime(dateAndTime);
-		this->setEventId(eventId);
 		this->setName(name);
 		this->setLocation(location);
 	}
@@ -54,6 +85,22 @@ public:
 	/*~Event() {
 	}*/
 
+	void generateUniqueID(const vector<Event>& events) {
+		bool isUnique = false;
+		int crtID;
+
+		while (!isUnique) {
+			isUnique = true;
+			crtID = generateID();
+			for (const Event& ev : events) {
+				if (ev.eventId == crtID) {
+					isUnique = false;
+				}
+			}
+		}
+		this->eventId = crtID;
+	}
+
 	void operator=(const Event& aux) {//this is an operator type "="
 		if (this == &aux) {
 			return;
@@ -94,10 +141,12 @@ public:
 };
 
 void operator<<(ostream& out, Event event) {//this is the operator "<<"
-	out << endl << "Event id: " << event.eventId;
-	out << endl << "Event name: " << (event.name.empty() ? string(event.name) : "No name");
-	out << endl << "Date and time: " << (event.dateAndTime.empty() ? string(event.dateAndTime) : "No date and time");
-	out << endl << "location is : " << event.location.getlocationName();
+	out << "----------" << endl;
+	out << endl << "Event id: " << event.eventId << endl;
+	out << endl << "Event name: " << (!event.name.empty() ? string(event.name) : "No name") << endl;
+	out << endl << "Date and time: " << (!event.dateAndTime.empty() ? string(event.dateAndTime) : "No date and time") << endl;
+	out << endl << "Location is : " << event.location.getLocationName() << endl;
+	out << "----------" << endl;
 }
 void operator>>(istream& in, Event& event) {//this is the operator">>"
 	cout << endl << "Location ID: ";
