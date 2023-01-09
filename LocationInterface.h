@@ -22,19 +22,19 @@ public:
 	}
 	LocationInterface() {}
 
-	string getLocationName() const {
+	virtual string getLocationName() const {
 		return this->locationName;
 	}
-	int getTotalNoOfSeats() const{
+	virtual int getTotalNoOfSeats() const{
 		return this->totalNoOfSeats;
 	}
-	void setLocationName(string locationName) {//this is also a setter that is computed by a vector of char allocated dynamic, this setter has the target to verifiy if it exists a location name in the array of characters, if exists, we also delete the old char and after that we create a new memory space and we copy by strcpy the old locationName in the new locationName
-		if (locationName.empty() || locationName.length() == 0) {
+	virtual void setLocationName(string locationName) {//this is also a setter that is computed by a vector of char allocated dynamic, this setter has the target to verifiy if it exists a location name in the array of characters, if exists, we also delete the old char and after that we create a new memory space and we copy by strcpy the old locationName in the new locationName
+		if (locationName.empty() || locationName.length() == 0 || locationName == "\n") {
 			exit(1);
 		}
 		this->locationName = locationName;
 	}
-	void setTotalNoOfSeats(int totalNoOfSeats) {//this is a setter for total number of seats. we also put here a condition for numbers because it can't be less or equal to 0, because it means it doesn't exists, so if it doesn't exists, we put a warning message to inform the user
+	virtual void setTotalNoOfSeats(int totalNoOfSeats) {//this is a setter for total number of seats. we also put here a condition for numbers because it can't be less or equal to 0, because it means it doesn't exists, so if it doesn't exists, we put a warning message to inform the user
 		if (totalNoOfSeats > 0) {
 			this->totalNoOfSeats = totalNoOfSeats;
 		}

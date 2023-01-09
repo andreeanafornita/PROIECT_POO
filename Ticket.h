@@ -119,13 +119,14 @@ public:
 		this->id = id;
 	}
 
-	void useTicket() {//this is a static method by which we can make a ticket from "not used" to "used"
+	bool useTicket() {//this is a static method by which we can make a ticket from "not used" to "used"
 		if (!this->isUsed) {
 			this->isUsed = true;
+			return true;
 		}
 		else {
-			cout << "The ticket is already used"<<endl;
-			exit(1);
+			cout << "The ticket with ID " << this->id << " has already been used"<<endl;
+			return false;
 		}
 	}
 
@@ -187,6 +188,7 @@ void operator<<(ostream& out, Ticket ticket) {//this is the output operator
 	out << "----------" << endl;
 }
 void operator>>(istream& in, Ticket& ticket) {//this is the input operator
+	//not used
 	cout << endl << "id: ";
 	in >> ticket.id;
 	cout << endl << "event is: ";

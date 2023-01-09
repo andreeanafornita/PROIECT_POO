@@ -88,7 +88,7 @@ public:
 		this->location = location;
 	}
 	void setAvailableNoOfSeats(int availableNoOfSeats) {
-		if (availableNoOfSeats > 0) {
+		if (availableNoOfSeats >= 0) {
 			this->availableNoOfSeats = availableNoOfSeats;
 		}
 		else {
@@ -100,15 +100,13 @@ public:
 	bool checkAvailability() {//this is also a method by which we can found out if there are or are no more available seats
 		return this->availableNoOfSeats != 0;
 	}
-	void removeAvailableSeat(int seats) {//this is a setter who has a an integer variable "seats", who has the target to remove available seats if the client who wants a number of seats is less or equal than the available number of seats. if not, it will appear a warning message to the user
+	void removeAvailableSeats(int seats) {//this is a setter who has a an integer variable "seats", who has the target to remove available seats if the client who wants a number of seats is less or equal than the available number of seats. if not, it will appear a warning message to the user
 		if (this->availableNoOfSeats < seats) {
 			cout << "There are less available seats than specified";
 			exit(1);
 		}
 		this->availableNoOfSeats = this->availableNoOfSeats - seats;
 	}
-	/*~Event() {
-	}*/
 
 	void generateUniqueID(const vector<Event>& events) {
 		bool isUnique = false;
@@ -136,28 +134,51 @@ public:
 	}
 
 	static bool readEvent(Event& event, string fileName) {
-		ifstream fin(fileName, ios::out | ios::binary);
+		ifstream fin(fileName);
 		if (!fin) {
 			cout << "Cannot open " << fileName << " for reading!" << endl;
 			return false;
 		}
-		fin.read((char*)&event, sizeof(Event));
-		fin.close();
-		if (!fin.good()) {
-			cout << "Error occurred while reading " << fileName << "!" << endl;
-			return false;
+
+		string tmpDateAndTime;
+		getline(fin, tmpDateAndTime);
+		event.setDateAndTime(tmpDateAndTime);
+
+		string tmpName;
+		getline(fin, tmpName);
+		event.setName(tmpName);
+
+		string tmpEventId;
+		getline(fin, tmpEventId);
+		event.setEventId(stoi(tmpEventId));
+
+		string tmpAvailableNoOfSeats;
+		getline(fin, tmpAvailableNoOfSeats);
+		event.setAvailableNoOfSeats(stoi(tmpAvailableNoOfSeats));
+		
+		Location tmpLocation;
+		if (Location::readLocation(tmpLocation, fin)) {
+			event.setLocation(tmpLocation);
 		}
+
+		fin.close();
 		return true;
 	}
 
 	static bool writeEvent(Event& ev, string path) {
 		string fileName = path + "\\event" + to_string(ev.eventId) + ".dat";
-		fstream wf(fileName, ios::out | ios::binary);
+		ofstream wf(fileName);
 		if (!wf) {
 			cout << "Cannot create file!" << endl;
 			return false;
 		}
-		wf.write((char*)&ev, sizeof(Event));
+		wf << ev.dateAndTime << endl;
+		wf << ev.name << endl;
+		wf << ev.eventId << endl;
+		wf << ev.availableNoOfSeats << endl;
+
+		Location::writeLocation(ev.location, wf);
+
 		wf.close();
 		if (!wf.good()) {
 			cout << "Error occurred when writing event with ID " << ev.eventId << "!" << endl;
@@ -174,6 +195,7 @@ public:
 		this->dateAndTime = aux.dateAndTime;
 		this->name = aux.name;
 		this->location = aux.location;
+		this->availableNoOfSeats = aux.availableNoOfSeats;
 	}
 	bool operator==(const Event& e) const
 	{
@@ -188,6 +210,7 @@ public:
 		this->eventId = aux1.eventId;
 		this->dateAndTime = aux1.dateAndTime;
 		this->location = aux1.location;
+		this->availableNoOfSeats = aux1.availableNoOfSeats;
 	}
 	friend void operator<<(ostream& out, Event event);
 	friend void operator>>(istream& in, Event& event);
@@ -211,6 +234,7 @@ void operator<<(ostream& out, Event event) {//this is the operator "<<"
 	out << "----------" << endl;
 }
 void operator>>(istream& in, Event& event) {//this is the operator">>"
+	//not used
 	cout << endl << "Location ID: ";
 	in >> event.eventId;
 	cout << endl << "Name: ";

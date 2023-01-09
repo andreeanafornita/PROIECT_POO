@@ -68,16 +68,77 @@ public:
 		this->locationId = crtID;
 	}
 
+	static bool readLocation(Location& location, ifstream& fin) {
+		if (!fin) {
+			cout << "Error while reading location for event!" << endl;
+			return false;
+		}
+		string tmpLocationName;
+		getline(fin, tmpLocationName);
+		location.setLocationName(tmpLocationName);
+
+		string tmpSeatsNo;
+		getline(fin, tmpSeatsNo);
+		location.setTotalNoOfSeats(stoi(tmpSeatsNo));
+
+		string tmpLocationId;
+		getline(fin, tmpLocationId);
+		location.setLocationId(stoi(tmpLocationId));
+
+		while (!fin.eof())
+		{
+			Area a;
+			if (Area::readArea(a, fin)) {
+				location.areas.push_back(a);
+			}
+		}
+		return true;
+	}
+
 	static bool readLocation(Location& location, string fileName) {
-		ifstream fin(fileName, ios::out | ios::binary);
+		ifstream fin(fileName);
 		if (!fin) {
 			cout << "Cannot open " << fileName << " for reading!" << endl;
 			return false;
 		}
-		fin.read((char*)&location, sizeof(Location));
+		string tmpLocationName;
+		getline(fin, tmpLocationName);
+		location.setLocationName(tmpLocationName);
+
+		string tmpSeatsNo;
+		getline(fin, tmpSeatsNo);
+		location.setTotalNoOfSeats(stoi(tmpSeatsNo));
+
+		string tmpLocationId;
+		getline(fin, tmpLocationId);
+		location.setLocationId(stoi(tmpLocationId));
+
+		while (!fin.eof())
+		{
+			Area a;
+			if (Area::readArea(a, fin)) {
+				location.areas.push_back(a);
+			}
+		}
 		fin.close();
-		if (!fin.good()) {
-			cout << "Error occurred while reading " << fileName << "!" << endl;
+		return true;
+	}
+
+	static bool writeLocation(Location& loc, ofstream& wf) {
+		if (!wf) {
+			cout << "Error while writing!" << endl;
+			return false;
+		}
+		wf << loc.getLocationName() << endl;
+		wf << loc.getTotalNoOfSeats() << endl;
+		wf << loc.locationId << endl;
+
+		for (Area& area : loc.areas) {
+			Area::writeArea(area, wf);
+		}
+
+		if (!wf.good()) {
+			cout << "Error occurred when writing location with ID " << loc.locationId << "!" << endl;
 			return false;
 		}
 		return true;
@@ -85,12 +146,19 @@ public:
 
 	static bool writeLocation(Location& loc, string path) {
 		string fileName = path + "\\location" + to_string(loc.locationId) + ".dat";
-		fstream wf(fileName, ios::out | ios::binary);
+		ofstream wf(fileName);
 		if (!wf) {
 			cout << "Cannot create file!" << endl;
 			return false;
 		}
-		wf.write((char*)&loc, sizeof(Location) + (sizeof(Area) * loc.getAreas().size()));
+		wf << loc.getLocationName() << endl;
+		wf << loc.getTotalNoOfSeats() << endl;
+		wf << loc.locationId << endl;
+
+		for (Area& area : loc.areas) {
+			Area::writeArea(area, wf);
+		}
+
 		wf.close();
 		if (!wf.good()) {
 			cout << "Error occurred when writing location with ID " << loc.locationId << "!" << endl;
@@ -155,7 +223,6 @@ void operator<<(ostream& out, Location location) {//this is the operator "<<"
 		out << area;
 	}
 	out << "----------" << endl;
-	//todo:print areas
 }
 
 void operator>>(istream& in, Location& location) {//this is the operator">>"
@@ -173,7 +240,6 @@ void operator>>(istream& in, Location& location) {//this is the operator">>"
 
 	while (!tryParse(input, numSeats)) {
 		std::cout << "Bad entry. Enter a NUMBER: ";
-		cin.clear();
 		getline(in, input);
 	}
 	//
@@ -186,13 +252,11 @@ void operator>>(istream& in, Location& location) {//this is the operator">>"
 	int totalSeatsInAreas = 0;
 	vector<Area> areas;
 	do {
-		//input.clear();
 		//Ask player to create an area
 		std::cout << "Do you want to create an area?" << endl << "1. Yes" << endl << "0. No" << endl;
 		getline(in, input);
 		while (!tryParse(input, option)) {
 			std::cout << "Bad entry. Enter a NUMBER: ";
-			cin.clear();
 			getline(in, input);
 		}
 		if (option == 1) {
@@ -225,15 +289,12 @@ void operator>>(istream& in, Location& location) {//this is the operator">>"
 
 			while (!tryParse(input, numRows)) {
 				std::cout << "Bad entry. Enter a NUMBER: ";
-				cin.clear();
 				getline(in, input);
 			}
 			//
 
 			//get number of seats per row
-			//input.clear();
 			std::cout << "Enter number of seats per row for General area: ";
-			//cin.clear();
 			getline(in, input);
 
 			while (!tryParse(input, numSeatsPerRow)) {

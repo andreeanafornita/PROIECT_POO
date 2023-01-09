@@ -36,6 +36,8 @@ private:
 
 public:
 	Area(string areaName, int noOfRows, int noOfSeatsPerRow, string type, string entrance): LocationInterface(areaName, noOfRows * noOfSeatsPerRow) {
+		this->noOfSeatsPerRow = noOfSeatsPerRow;
+		this->noOfRows = noOfRows;
 		this->type = type;
 		this->entrance = entrance;
 		this->areaId = -1;
@@ -119,30 +121,58 @@ public:
 		return nullptr;
 	}
 
-	static bool readArea(Area& area, string fileName) {
-		ifstream fin(fileName, ios::out | ios::binary);
-		if (!fin) {
-			cout << "Cannot open " << fileName << " for reading!" << endl;
+	static bool readArea(Area& area, ifstream& in) {
+		string tmpareaName;
+		getline(in, tmpareaName);
+		if (tmpareaName.size() == 0) {
 			return false;
 		}
-		fin.read((char*)&area, sizeof(Area));
-		fin.close();
-		if (!fin.good()) {
-			cout << "Error occurred while reading " << fileName << "!" << endl;
+		area.setLocationName(tmpareaName);
+		
+		string tmpareaTotalNoOfSeats;
+		getline(in, tmpareaTotalNoOfSeats);
+		area.setTotalNoOfSeats(stoi(tmpareaTotalNoOfSeats));
+		
+		string tmpareaId;
+		getline(in, tmpareaId);
+		area.setAreaId(stoi(tmpareaId));
+
+		string tmptype;
+		getline(in, tmptype);
+		area.setZoneType(tmptype);
+
+		string tmpentrance;
+		getline(in, tmpentrance);
+		area.setZoneEntrance(tmpentrance);
+
+		string tmpnoOfSeatsPerRow;
+		getline(in, tmpnoOfSeatsPerRow);
+		area.setNoOfSeatsPerRow(stoi(tmpnoOfSeatsPerRow));
+
+		string tmpnoOfRows;
+		getline(in, tmpnoOfRows);
+		area.setNoOfRows(stoi(tmpnoOfRows));
+
+		if (!in.good()) {
+			cout << "Error occurred while reading " << "!" << endl;
 			return false;
 		}
 		return true;
 	}
 
-	static bool writeArea(Area& area, string path) {
-		string fileName = path + "\\area" + to_string(area.areaId) + ".dat";
-		fstream wf(fileName, ios::out | ios::binary);
+	static bool writeArea(Area& area, ofstream& wf) {
 		if (!wf) {
-			cout << "Cannot create file!" << endl;
+			cout << "Error creating file!" << endl;
 			return false;
 		}
-		wf.write((char*)&area, sizeof(Area));
-		wf.close();
+		wf << area.getLocationName() << endl;
+		wf << area.getTotalNoOfSeats() << endl;
+		wf << area.areaId << endl;
+		wf << area.type << endl;
+		wf << area.entrance << endl;
+		wf << area.noOfSeatsPerRow << endl;
+		wf << area.noOfRows << endl;
+
 		if (!wf.good()) {
 			cout << "Error occurred when writing area with ID " << area.areaId << "!" << endl;
 			return false;
@@ -171,21 +201,17 @@ void operator>>(istream& in, Area& area) {
 
 	while (!tryParse(input, numRows)) {
 		std::cout << "Bad entry. Enter a NUMBER: ";
-		cin.clear();
 		getline(in, input);
 	}
 	//
 
 	//get number of seats per row
-	input.clear();
 	int numSeatsPerRow;
 	std::cout << "Enter number of seats per row: ";
-	//cin.clear();
 	getline(in, input);
 
 	while (!tryParse(input, numSeatsPerRow)) {
 		std::cout << "Bad entry. Enter a NUMBER: ";
-		cin.clear();
 		getline(in, input);
 	}
 	//
@@ -210,6 +236,8 @@ void operator<<(ostream& out, Area area) {
 	out << "Area name: " << (!area.getLocationName().empty() ? area.getLocationName() : "No name") << endl;
 	out << "Area id: " << area.getAreaId() << endl;
 	out << "The total number of seats are: " << area.getTotalNoOfSeats() << endl;
+	out << "The number of rows are: " << area.getNoOfRows() << endl;
+	out << "The number of seats per row are: " << area.getNoOfSeatsPerRow() << endl;
 	out << "Type of area: " << area.getZoneType() << endl;
 	out << "Entrance: " << area.getZoneEntrance() << endl;
 	out << "-----" << endl;
