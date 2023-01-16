@@ -48,9 +48,8 @@ public:
 		this->setLocation(location);
 		this->availableNoOfSeats = this->location.getTotalNoOfSeats();
 	}
-	Event() {
-		this->eventId = 0;
-	}
+	Event() = default;
+	
 	string getDateAndTime() {
 		return this->dateAndTime;
 	}

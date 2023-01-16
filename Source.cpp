@@ -188,6 +188,7 @@ void displayMenu(vector<Event>& events, vector<Location>& locations, vector<Tick
 				Ticket t(events[crtEvIndex].getEventId(), price);
 				Ticket::writeTicket(t, ticketsPathString);
 				noTickets--;
+				tickets.push_back(t);
 			}
 		}
 		else if (option == 3) {
@@ -306,7 +307,7 @@ void displayMenu(vector<Event>& events, vector<Location>& locations, vector<Tick
 					}
 				}
 				else {
-					Location loc = checkLocation(locations, id, found);
+					loc = checkLocation(locations, id, found);
 					if (!found) {
 						std::cout << "Could not find any location with id " << id << endl;
 					}

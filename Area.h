@@ -47,6 +47,21 @@ public:
 		this->areaId = -1; 
 	}
 
+
+	void setLocationName(string locationName) {
+		this->locationName = locationName; //override because the area name can be left empty
+	}
+
+	void setTotalNoOfSeats(int totalNoOfSeats) {
+		if (totalNoOfSeats > 0) {
+			this->totalNoOfSeats = totalNoOfSeats;
+		}
+		else {
+			cout << "Total number of seats should be greater than 0";
+			exit(1);
+		}
+	}
+
 	void generateUniqueID(int locationID, vector<Area> areas) {
 		bool isUnique = false;
 		int crtID;

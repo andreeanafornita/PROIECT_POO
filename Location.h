@@ -48,8 +48,20 @@ public:
 		this->locationId = -1;
 		this->areas = areas;
 	}
-	Location() {
-		this->locationId = 0;//this is the default constructor
+	Location() = default;
+
+	void setLocationName(string locationName) {
+		this->locationName = locationName; //override because the location name can be left empty
+	}
+
+	void setTotalNoOfSeats(int totalNoOfSeats) {
+		if (totalNoOfSeats > 0) {
+			this->totalNoOfSeats = totalNoOfSeats;
+		}
+		else {
+			cout << "Total number of seats might be greater than 0";
+			exit(1);
+		}
 	}
 
 	void generateUniqueID(const vector<Location>& locations) {
@@ -188,17 +200,17 @@ public:
 			return;
 		}
 
+		this->locationName = aux.getLocationName();
 		this->locationId = aux.locationId;
-		this->setTotalNoOfSeats(aux.getTotalNoOfSeats());
-		this->setLocationName(aux.getLocationName());
-		this->setAreas(aux.getAreas());
+		this->totalNoOfSeats = aux.getTotalNoOfSeats();
+		this->areas = aux.getAreas();
 	}
 
 	Location(const Location& aux) {//this is a copy constructor
-		this->setLocationName(aux.getLocationName());
+		this->locationName = aux.getLocationName();
 		this->locationId = aux.locationId;
-		this->setTotalNoOfSeats(aux.getTotalNoOfSeats());
-		this->setAreas(aux.getAreas());
+		this->totalNoOfSeats = aux.getTotalNoOfSeats();
+		this->areas = aux.getAreas();
 	}
 	friend void operator<<(ostream& out, Location location);
 	friend void operator>>(istream& in, Location& location);

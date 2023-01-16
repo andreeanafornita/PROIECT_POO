@@ -53,10 +53,8 @@ public:
 		this->isUsed = false;
 		this->setId(generateID());
 	}
-	Ticket() {//this is the default constructor, uith initializer for the boolean variable in false
-		this->isUsed = false;
-	}
-
+	Ticket() = default;
+		
 	static bool readTicket(Ticket& ticket, string fileName) {
 		ifstream fin(fileName, ios::out | ios::binary);
 		if (!fin) {
