@@ -1,10 +1,19 @@
 # PROIECT_POO
+## Getting Started
 
-Note: The program saves all the data (events/locations/tickets) in the folder called "data";
+**Note:** The program stores all data (events, locations, and tickets) in the "data" folder.
 
-Note: If you want to run the program with the CreateLocationsAndEvents command file you need to first delete the "data\locations" and "data\events" folder.
+**Important:** If you wish to execute the program using the `CreateLocationsAndEvents` command file, it's essential to first remove the "data\locations" and "data\events" folders.
 
-If you want a clean run of the program, delete the data folder and run the command files in this order:
-1. CreateLocationsAndEvents
-2. GenerateTickets
-3. UseAndCheckTickets - need to be updated with valid tickets IDs
+For a smooth and clean execution of the program, follow these steps:
+
+1. Delete the entire "data" folder.
+2. Run the command files in the specified sequence:
+   - `CreateLocationsAndEvents`
+   - `GenerateTickets`
+   - `UseAndCheckTickets` *(Please note that this file requires an update with valid ticket IDs)*.
+
+This process will ensure a fresh start and allow you to experience the program without any issues.
+
+Happy exploring!
+
