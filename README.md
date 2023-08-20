@@ -1,4 +1,4 @@
-# PROIECT_POO
+# POO PROJECT
 ## Getting Started
 
 **Note:** The program stores all data (events, locations, and tickets) in the "data" folder.
